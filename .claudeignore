@@ -1,0 +1,17 @@
+node_modules/
+.next/
+dist/
+build/
+coverage/
+playwright-report/
+.venv/
+__pycache__/
+*.pyc
+pnpm-lock.yaml
+uv.lock
+.env
+.env.*
+.claude/verify-artifacts/
+.claude/dev-server.log
+fixtures/**/*.xlsx
+docs/references/*.docx

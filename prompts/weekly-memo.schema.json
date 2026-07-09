@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WeeklyMemo",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["headline", "summaryMd", "keyNumbers", "risks"],
+  "properties": {
+    "headline": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "summaryMd": { "type": "string", "minLength": 1, "maxLength": 2500 },
+    "keyNumbers": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "type": "string", "minLength": 1 },
+          "value": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "maxItems": 4,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

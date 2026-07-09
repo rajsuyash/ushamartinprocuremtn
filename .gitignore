@@ -1,0 +1,15 @@
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+.claude/dev-server.log
+.claude/verify-artifacts/
+playwright-report/
+docs/references/*.docx
