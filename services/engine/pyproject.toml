@@ -1,0 +1,21 @@
+[project]
+name = "pdi-engine"
+version = "0.1.0"
+description = "PDI procurement analytics engine"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic>=2.0",
+    "psycopg[binary]",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "httpx",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
