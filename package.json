@@ -1,0 +1,13 @@
+{
+  "name": "pdi",
+  "private": true,
+  "packageManager": "pnpm@10.30.0",
+  "scripts": {
+    "dev": "pnpm --filter @pdi/web dev",
+    "build": "pnpm -r --if-present build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm -r --if-present test",
+    "seed": "node -e \"const e = new Error('SEED_NOT_IMPLEMENTED: real seed data ships in task T5'); e.name = 'SeedNotImplementedError'; throw e;\""
+  }
+}

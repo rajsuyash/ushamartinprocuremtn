@@ -5,7 +5,7 @@
 | Field | Value |
 |---|---|
 | Status | approved (2026-07-09T00:00:00+05:30) |
-| PRD | docs/PRD.md · shape: v3 · sha256: 0a7dbca6 |
+| PRD | docs/PRD.md · shape: v3 · sha256: e5480c2c (v1.1, Appendix-B-only edit) |
 | Planner | project-planning-orchestrator v1.0.0 · session model: fable (claude-fable-5) |
 | Probe | scaffolded: Y · prd-to-ship: Y · devfleet: N (groups would be advisory) · tiers available: fable, opus, sonnet, haiku (assumed all four — override at Gate P) |
 | Mode | fresh |
@@ -245,7 +245,7 @@ Milestones: 8 (M0–M7) · Tasks: 35 (27 feature / 7 enabler / 1 spike) · ACs c
   "schema": "execution-plan/v1",
   "status": "approved",
   "approved_at": "2026-07-09T00:00:00+05:30",
-  "prd": { "path": "docs/PRD.md", "sha256": "0a7dbca6fd122e54c667458d16e298f2433a393d7ef2253efa1a6514657b930c", "shape": "v3" },
+  "prd": { "path": "docs/PRD.md", "sha256": "e5480c2cba1171531cb63d8dba2141fd339a2a4127a256d965417d61eeccd8d1", "shape": "v3" },
   "session": { "session_model": "fable", "tiers_available": ["fable", "opus", "sonnet", "haiku"] },
   "routing_defaults": { "low": "haiku", "med": "sonnet", "high": "opus" },
   "milestones": [

@@ -755,3 +755,5 @@ Conventions used throughout:
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | v1 | 2026-07-07 | human+agent | Initial draft |
+| v1.1 | 2026-07-09 | agent (T1) | §4 stack versions resolved against current stable at lockfile creation: Next 16.x (not 15.x), React 19.2, TypeScript 6.0.3 (lint-toolchain cap), Tailwind v4 (CSS-first config). All PROPOSED items; §0 rule 3 applied. |
+| v1.1 | 2026-07-09 | agent (plan) | Delegated decisions recorded: D1 papaparse + exceljs streaming (F2 parsing), D2 decision immutability via app layer + UNIQUE constraints (no trigger), D3 web-side sequential run orchestrator — details in docs/EXECUTION_PLAN.md §C. |

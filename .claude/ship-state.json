@@ -1,72 +1,630 @@
 {
   "version": 2,
-  "prd": { "path": "docs/PRD.md", "sha256": "0a7dbca6fd122e54c667458d16e298f2433a393d7ef2253efa1a6514657b930c", "shape": "v3" },
-  "plan": { "source": "project-planning-orchestrator", "path": "docs/EXECUTION_PLAN.md", "status": "approved" },
+  "prd": {
+    "path": "docs/PRD.md",
+    "sha256": "e5480c2cba1171531cb63d8dba2141fd339a2a4127a256d965417d61eeccd8d1",
+    "shape": "v3"
+  },
+  "plan": {
+    "source": "project-planning-orchestrator",
+    "path": "docs/EXECUTION_PLAN.md",
+    "status": "approved"
+  },
   "capabilities": {
-    "plan": true, "verify": true, "verify-api": true, "evals": true, "review": true, "ship": true,
-    "verify-ext": false, "tdd": true, "uat-runner": true, "code-review": true, "autoplan": true,
-    "devfleet": false, "search-first": true, "deep-research": true, "investigate": true,
-    "browse": true, "qa": true, "design-review": true, "land-and-deploy": true, "canary": true,
-    "karpathy-guidelines": true, "claude-mem": true
+    "plan": true,
+    "verify": true,
+    "verify-api": true,
+    "evals": true,
+    "review": true,
+    "ship": true,
+    "verify-ext": false,
+    "tdd": true,
+    "uat-runner": true,
+    "code-review": true,
+    "autoplan": true,
+    "devfleet": false,
+    "search-first": true,
+    "deep-research": true,
+    "investigate": true,
+    "browse": true,
+    "qa": true,
+    "design-review": true,
+    "land-and-deploy": true,
+    "canary": true,
+    "karpathy-guidelines": true,
+    "claude-mem": true
   },
   "gates": {
-    "g1": { "approved_at": null, "user_notes": null },
-    "g2": { "approved_at": null, "modifications": [], "source": "execution-plan/v1 pre-seed" },
-    "g3": { "approved_at": null, "readiness_verdict": null }
+    "g1": {
+      "approved_at": "2026-07-09T00:30:00+05:30",
+      "user_notes": "approved via 'start executing the plan'; parallel agents requested where independent"
+    },
+    "g2": {
+      "approved_at": "2026-07-09T00:30:00+05:30",
+      "modifications": [
+        "user override: run pairwise-independent tasks as parallel subagents (T1||T2, T4/T8 serialized on package.json, T9||T11, T23||T24, T28||T30)"
+      ],
+      "source": "execution-plan/v1 pre-seed"
+    },
+    "g3": {
+      "approved_at": null,
+      "readiness_verdict": null
+    }
   },
   "milestones": [
-    { "id": "M0", "status": "pending", "exit_acs": ["SKEL-AC1", "SKEL-AC2"], "tasks": [
-      { "id": "T1", "name": "Monorepo + Next.js shell with /login placeholder", "acs": ["SKEL-AC1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T2", "name": "Engine skeleton: FastAPI /health + ENV fail-fast", "acs": ["SKEL-AC2"], "complexity": "low", "model_tier": "haiku", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T3", "name": "Docker Compose + env wiring + fail-fast", "acs": ["SKEL-AC1", "SKEL-AC2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] }
-    ] },
-    { "id": "M1", "status": "pending", "exit_acs": ["F1-AC1", "F1-AC2", "F1-AC3", "F1-ERR1", "F1-ERR2", "F1-ERR3", "F2-AC1", "F2-AC2", "F2-AC3", "F2-AC4", "F2-ERR1", "F2-ERR2", "F2-ERR3", "F2-ERR4"], "tasks": [
-      { "id": "T4", "name": "Full DB schema E1-E17 + Drizzle migrations", "acs": [], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T8", "name": "Ingest parsing lib", "acs": ["F2-AC4"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T5", "name": "Seed: FIX-1/2/3/5 + pnpm seed", "acs": [], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T6", "name": "Auth.js credentials + middleware + login", "acs": ["F1-AC1", "F1-AC2", "F1-ERR1", "F1-ERR3"], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T7", "name": "Envelope + RBAC guards + rec stubs", "acs": ["F1-AC3", "F1-ERR2"], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T9", "name": "Upload API stage/validate/commit", "acs": ["F2-AC2", "F2-ERR1", "F2-ERR2", "F2-ERR3"], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T11", "name": "Runs API + orchestrator + stubs", "acs": ["F2-AC3", "F2-ERR4"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T10", "name": "/data page", "acs": ["F2-AC1", "F2-ERR2", "F2-ERR3"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] }
-    ] },
-    { "id": "M2", "status": "pending", "exit_acs": ["F3-AC1", "F3-AC2", "F3-AC3", "F3-ERR1", "F3-ERR2"], "tasks": [
-      { "id": "T12", "name": "Engine data layer + bucketing", "acs": [], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T13", "name": "Demand models + rolling-origin backtest", "acs": ["F3-AC1", "F3-AC3", "F3-ERR1", "F3-ERR2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T14", "name": "/v1/forecast/demand + E10 persist", "acs": ["F3-AC1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T15", "name": "/forecasts demand tab UI", "acs": ["F3-AC2", "F3-ERR1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] }
-    ] },
-    { "id": "M3", "status": "pending", "exit_acs": ["F4-AC1", "F4-AC2", "F4-AC3", "F4-ERR1", "F4-ERR2"], "tasks": [
-      { "id": "T16", "name": "Quantile LightGBM + baseline + repair + coverage", "acs": ["F4-AC1", "F4-AC3", "F4-ERR1", "F4-ERR2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T17", "name": "/v1/forecast/price + E11 persist", "acs": ["F4-AC1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T18", "name": "/forecasts price tab UI", "acs": ["F4-AC2", "F4-ERR1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] }
-    ] },
-    { "id": "M4", "status": "pending", "exit_acs": ["F5-AC1", "F5-AC2", "F5-AC3", "F5-ERR1", "F5-ERR2", "F5-ERR3"], "tasks": [
-      { "id": "T19", "name": "SPIKE: MILP formulation note", "acs": [], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T20", "name": "Recommendation inputs: cover/offers/policy/share", "acs": [], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T21", "name": "MILP + Monte Carlo + classifier + rationale", "acs": ["F5-AC1", "F5-AC2", "F5-AC3", "F5-ERR1", "F5-ERR3"], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T22", "name": "/v1/recommend + persist + expiry + rec list API", "acs": ["F5-AC1", "F5-AC3", "F5-ERR2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] }
-    ] },
-    { "id": "M5", "status": "pending", "exit_acs": ["F6-AC1", "F6-AC2", "F6-AC3", "F6-ERR1", "F6-ERR2", "F6-ERR3"], "tasks": [
-      { "id": "T23", "name": "Dashboard tiles + banner", "acs": ["F6-AC1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T24", "name": "Rec list + detail rationale render", "acs": ["F6-AC2", "F6-AC3"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T25", "name": "Decision API: immutable, decide-once, idempotent", "acs": ["F6-AC2", "F6-AC3", "F6-ERR1", "F6-ERR2", "F6-ERR3"], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T26", "name": "Decision UI", "acs": ["F6-AC2", "F6-AC3", "F6-ERR1", "F6-ERR2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T27", "name": "P0 regression consolidation", "acs": [], "complexity": "low", "model_tier": "haiku", "status": "pending", "commit": null, "verified_layers": [] }
-    ] },
-    { "id": "M6", "status": "pending", "exit_acs": ["F7-AC1", "F7-AC2", "F7-ERR1", "F7-ERR2", "F8-AC1", "F8-AC2", "F8-ERR1", "F8-ERR2"], "tasks": [
-      { "id": "T28", "name": "Alert evaluation run stage", "acs": ["F7-AC1", "F7-ERR2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T29", "name": "Alerts UI + ack", "acs": ["F7-AC1", "F7-AC2", "F7-ERR1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T30", "name": "Value engine: baseline + actualization", "acs": ["F8-AC2", "F8-ERR2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T31", "name": "/reports/pilot UI", "acs": ["F8-AC1", "F8-ERR1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] }
-    ] },
-    { "id": "M7", "status": "pending", "exit_acs": ["F9-AC1", "F9-AC2", "F9-ERR1", "F9-ERR2", "F9-ERR3"], "tasks": [
-      { "id": "T32", "name": "Aggregates + template memo + /api/memo", "acs": ["F9-ERR1"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T33", "name": "Anthropic client + fallback chain", "acs": ["F9-AC1", "F9-ERR2", "F9-ERR3"], "complexity": "high", "model_tier": "opus", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T34", "name": "Eval entrypoint + /evals + memo UI", "acs": ["F9-AC1", "F9-AC2"], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] },
-      { "id": "T35", "name": "Launch pass: full regression + walkthrough + README", "acs": [], "complexity": "med", "model_tier": "sonnet", "status": "pending", "commit": null, "verified_layers": [] }
-    ] }
+    {
+      "id": "M0",
+      "status": "building",
+      "exit_acs": [
+        "SKEL-AC1",
+        "SKEL-AC2"
+      ],
+      "tasks": [
+        {
+          "id": "T1",
+          "name": "Monorepo + Next.js shell with /login placeholder",
+          "acs": [
+            "SKEL-AC1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T2",
+          "name": "Engine skeleton: FastAPI /health + ENV fail-fast",
+          "acs": [
+            "SKEL-AC2"
+          ],
+          "complexity": "low",
+          "model_tier": "haiku",
+          "status": "verified",
+          "commit": "0bc8736",
+          "verified_layers": [
+            "unit"
+          ]
+        },
+        {
+          "id": "T3",
+          "name": "Docker Compose + env wiring + fail-fast",
+          "acs": [
+            "SKEL-AC1",
+            "SKEL-AC2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    },
+    {
+      "id": "M1",
+      "status": "pending",
+      "exit_acs": [
+        "F1-AC1",
+        "F1-AC2",
+        "F1-AC3",
+        "F1-ERR1",
+        "F1-ERR2",
+        "F1-ERR3",
+        "F2-AC1",
+        "F2-AC2",
+        "F2-AC3",
+        "F2-AC4",
+        "F2-ERR1",
+        "F2-ERR2",
+        "F2-ERR3",
+        "F2-ERR4"
+      ],
+      "tasks": [
+        {
+          "id": "T4",
+          "name": "Full DB schema E1-E17 + Drizzle migrations",
+          "acs": [],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T8",
+          "name": "Ingest parsing lib",
+          "acs": [
+            "F2-AC4"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T5",
+          "name": "Seed: FIX-1/2/3/5 + pnpm seed",
+          "acs": [],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T6",
+          "name": "Auth.js credentials + middleware + login",
+          "acs": [
+            "F1-AC1",
+            "F1-AC2",
+            "F1-ERR1",
+            "F1-ERR3"
+          ],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T7",
+          "name": "Envelope + RBAC guards + rec stubs",
+          "acs": [
+            "F1-AC3",
+            "F1-ERR2"
+          ],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T9",
+          "name": "Upload API stage/validate/commit",
+          "acs": [
+            "F2-AC2",
+            "F2-ERR1",
+            "F2-ERR2",
+            "F2-ERR3"
+          ],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T11",
+          "name": "Runs API + orchestrator + stubs",
+          "acs": [
+            "F2-AC3",
+            "F2-ERR4"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T10",
+          "name": "/data page",
+          "acs": [
+            "F2-AC1",
+            "F2-ERR2",
+            "F2-ERR3"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "status": "pending",
+      "exit_acs": [
+        "F3-AC1",
+        "F3-AC2",
+        "F3-AC3",
+        "F3-ERR1",
+        "F3-ERR2"
+      ],
+      "tasks": [
+        {
+          "id": "T12",
+          "name": "Engine data layer + bucketing",
+          "acs": [],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T13",
+          "name": "Demand models + rolling-origin backtest",
+          "acs": [
+            "F3-AC1",
+            "F3-AC3",
+            "F3-ERR1",
+            "F3-ERR2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T14",
+          "name": "/v1/forecast/demand + E10 persist",
+          "acs": [
+            "F3-AC1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T15",
+          "name": "/forecasts demand tab UI",
+          "acs": [
+            "F3-AC2",
+            "F3-ERR1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    },
+    {
+      "id": "M3",
+      "status": "pending",
+      "exit_acs": [
+        "F4-AC1",
+        "F4-AC2",
+        "F4-AC3",
+        "F4-ERR1",
+        "F4-ERR2"
+      ],
+      "tasks": [
+        {
+          "id": "T16",
+          "name": "Quantile LightGBM + baseline + repair + coverage",
+          "acs": [
+            "F4-AC1",
+            "F4-AC3",
+            "F4-ERR1",
+            "F4-ERR2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T17",
+          "name": "/v1/forecast/price + E11 persist",
+          "acs": [
+            "F4-AC1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T18",
+          "name": "/forecasts price tab UI",
+          "acs": [
+            "F4-AC2",
+            "F4-ERR1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    },
+    {
+      "id": "M4",
+      "status": "pending",
+      "exit_acs": [
+        "F5-AC1",
+        "F5-AC2",
+        "F5-AC3",
+        "F5-ERR1",
+        "F5-ERR2",
+        "F5-ERR3"
+      ],
+      "tasks": [
+        {
+          "id": "T19",
+          "name": "SPIKE: MILP formulation note",
+          "acs": [],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T20",
+          "name": "Recommendation inputs: cover/offers/policy/share",
+          "acs": [],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T21",
+          "name": "MILP + Monte Carlo + classifier + rationale",
+          "acs": [
+            "F5-AC1",
+            "F5-AC2",
+            "F5-AC3",
+            "F5-ERR1",
+            "F5-ERR3"
+          ],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T22",
+          "name": "/v1/recommend + persist + expiry + rec list API",
+          "acs": [
+            "F5-AC1",
+            "F5-AC3",
+            "F5-ERR2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    },
+    {
+      "id": "M5",
+      "status": "pending",
+      "exit_acs": [
+        "F6-AC1",
+        "F6-AC2",
+        "F6-AC3",
+        "F6-ERR1",
+        "F6-ERR2",
+        "F6-ERR3"
+      ],
+      "tasks": [
+        {
+          "id": "T23",
+          "name": "Dashboard tiles + banner",
+          "acs": [
+            "F6-AC1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T24",
+          "name": "Rec list + detail rationale render",
+          "acs": [
+            "F6-AC2",
+            "F6-AC3"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T25",
+          "name": "Decision API: immutable, decide-once, idempotent",
+          "acs": [
+            "F6-AC2",
+            "F6-AC3",
+            "F6-ERR1",
+            "F6-ERR2",
+            "F6-ERR3"
+          ],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T26",
+          "name": "Decision UI",
+          "acs": [
+            "F6-AC2",
+            "F6-AC3",
+            "F6-ERR1",
+            "F6-ERR2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T27",
+          "name": "P0 regression consolidation",
+          "acs": [],
+          "complexity": "low",
+          "model_tier": "haiku",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    },
+    {
+      "id": "M6",
+      "status": "pending",
+      "exit_acs": [
+        "F7-AC1",
+        "F7-AC2",
+        "F7-ERR1",
+        "F7-ERR2",
+        "F8-AC1",
+        "F8-AC2",
+        "F8-ERR1",
+        "F8-ERR2"
+      ],
+      "tasks": [
+        {
+          "id": "T28",
+          "name": "Alert evaluation run stage",
+          "acs": [
+            "F7-AC1",
+            "F7-ERR2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T29",
+          "name": "Alerts UI + ack",
+          "acs": [
+            "F7-AC1",
+            "F7-AC2",
+            "F7-ERR1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T30",
+          "name": "Value engine: baseline + actualization",
+          "acs": [
+            "F8-AC2",
+            "F8-ERR2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T31",
+          "name": "/reports/pilot UI",
+          "acs": [
+            "F8-AC1",
+            "F8-ERR1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    },
+    {
+      "id": "M7",
+      "status": "pending",
+      "exit_acs": [
+        "F9-AC1",
+        "F9-AC2",
+        "F9-ERR1",
+        "F9-ERR2",
+        "F9-ERR3"
+      ],
+      "tasks": [
+        {
+          "id": "T32",
+          "name": "Aggregates + template memo + /api/memo",
+          "acs": [
+            "F9-ERR1"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T33",
+          "name": "Anthropic client + fallback chain",
+          "acs": [
+            "F9-AC1",
+            "F9-ERR2",
+            "F9-ERR3"
+          ],
+          "complexity": "high",
+          "model_tier": "opus",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T34",
+          "name": "Eval entrypoint + /evals + memo UI",
+          "acs": [
+            "F9-AC1",
+            "F9-AC2"
+          ],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        },
+        {
+          "id": "T35",
+          "name": "Launch pass: full regression + walkthrough + README",
+          "acs": [],
+          "complexity": "med",
+          "model_tier": "sonnet",
+          "status": "pending",
+          "commit": null,
+          "verified_layers": []
+        }
+      ]
+    }
   ],
   "failures": [],
-  "log": ["2026-07-09 state initialized from EXECUTION_PLAN.md §J (approved, sha 0a7dbca6)"]
+  "log": [
+    "2026-07-09 state initialized from EXECUTION_PLAN.md \u00a7J (approved, sha 0a7dbca6)",
+    "2026-07-09T00:30:00+05:30 G1 approved",
+    "2026-07-09T00:30:00+05:30 G2 approved (pre-seeded plan adopted)",
+    "2026-07-09T00:30:00+05:30 git init 708db35",
+    "2026-07-09T00:30:00+05:30 M0 building: T1||T2 dispatched",
+    "2026-07-09 T2 committed 0bc8736 (6 pytest green on clean env; fixed import-time env load + sync-in-async ping \u2014 session review)",
+    "2026-07-09 PRD v1.1 (Appendix B only: version resolution + delegated decisions) \u2014 sha updated to e5480c2c"
+  ]
 }
