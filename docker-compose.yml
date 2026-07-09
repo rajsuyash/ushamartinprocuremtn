@@ -1,0 +1,55 @@
+# Local dev compose for the M0 walking skeleton (SKEL-AC1, SKEL-AC2).
+# Values are read from .env at repo root (gitignored, dev-only — see .env.example for the shape).
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pdi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pdi_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-pdi}
+    volumes:
+      - pdi_postgres_data:/var/lib/postgresql/data
+    # Published to host loopback only, for host-side tooling (drizzle migrations, psql, `pnpm test`
+    # against a live DB later) — never exposed beyond the dev machine.
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pdi} -d ${POSTGRES_DB:-pdi}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  engine:
+    build:
+      context: ./services/engine
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pdi}:${POSTGRES_PASSWORD:-pdi_dev}@postgres:5432/${POSTGRES_DB:-pdi}
+      APP_ENV: ${APP_ENV:-development}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # PRD §4: engine is internal-only (reachable from the web server, never the public internet).
+    # This loopback-only mapping exists purely so SKEL-AC2's host curl can hit /health directly;
+    # it is not a public port. ENGINE_HOST_PORT lets it move if 8000 is already taken on the host.
+    ports:
+      - "127.0.0.1:${ENGINE_HOST_PORT:-8000}:8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-pdi}:${POSTGRES_PASSWORD:-pdi_dev}@postgres:5432/${POSTGRES_DB:-pdi}
+      AUTH_SECRET: ${AUTH_SECRET}
+      ENGINE_URL: http://engine:8000
+      APP_ENV: ${APP_ENV:-development}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${WEB_HOST_PORT:-3000}:3000"
+
+volumes:
+  pdi_postgres_data:

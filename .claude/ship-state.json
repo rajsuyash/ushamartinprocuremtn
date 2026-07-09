@@ -68,9 +68,11 @@
           ],
           "complexity": "med",
           "model_tier": "sonnet",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "b146bcc",
+          "verified_layers": [
+            "unit"
+          ]
         },
         {
           "id": "T2",
@@ -625,6 +627,7 @@
     "2026-07-09T00:30:00+05:30 git init 708db35",
     "2026-07-09T00:30:00+05:30 M0 building: T1||T2 dispatched",
     "2026-07-09 T2 committed 0bc8736 (6 pytest green on clean env; fixed import-time env load + sync-in-async ping \u2014 session review)",
-    "2026-07-09 PRD v1.1 (Appendix B only: version resolution + delegated decisions) \u2014 sha updated to e5480c2c"
+    "2026-07-09 PRD v1.1 (Appendix B only: version resolution + delegated decisions) \u2014 sha updated to e5480c2c",
+    "2026-07-09 T1 committed b146bcc (typecheck/lint/test/build 0; /login 200 w/ form; Next 16 divergence -> PRD v1.1). T3 dispatched."
   ]
 }
