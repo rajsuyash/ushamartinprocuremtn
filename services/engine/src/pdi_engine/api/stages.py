@@ -1,9 +1,8 @@
 """Run-stage endpoints (T11, EXECUTION_PLAN D3).
 
 The web-side orchestrator (apps/web/src/lib/run-orchestrator.ts) calls these in order:
-demand forecast -> price forecast -> recommend. `/forecast/demand` (T14) and
-`/forecast/price` (T17) are real implementations persisting E10/E11 rows;
-`recommend` remains an M1 stateless stub until T22 lands.
+demand forecast -> price forecast -> recommend. All three (T14, T17, T22) are real
+implementations persisting E10/E11/E13 rows.
 """
 from __future__ import annotations
 
@@ -12,13 +11,16 @@ from uuid import UUID
 
 import psycopg
 from fastapi import APIRouter
+from psycopg.types.json import Jsonb
 from pydantic import BaseModel, field_validator
 
 from ..config import get_settings
-from ..data.readers import load_consumption, load_market_prices
+from ..data.readers import load_consumption, load_market_prices, load_materials
 from ..data.weekly import to_iso_weekly, weekly_prices
 from ..demand.select import InsufficientHistoryError, run_series
 from ..price.select import BASELINE_FALLBACK, QUANTILE_REPAIRED, run_grade_family
+from ..recommend.inputs import MissingPriceBandError, assemble_series_inputs, list_series
+from ..recommend.recommend import recommend_series
 
 router = APIRouter(prefix="/v1", tags=["run-stages"])
 
@@ -237,8 +239,132 @@ async def forecast_price(body: StageRequest) -> dict:
     return await asyncio.to_thread(_forecast_price_sync, body.run_id)
 
 
+def _persist_recommendations(run_id: str, rows: list[dict]) -> None:
+    """Delete-and-rewrite this run_id's recommendations rows (same per-run
+    idempotency pattern as demand/price). After the rewrite, any recommendation
+    still PENDING from an earlier run is marked EXPIRED — PRD §7: "new runs mark
+    undecided older recs EXPIRED"."""
+    with psycopg.connect(get_settings().database_url) as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM recommendations WHERE run_id = %s", (run_id,))
+        if rows:
+            cur.execute("SELECT code, id FROM materials")
+            material_ids = dict(cur.fetchall())
+            cur.execute("SELECT code, id FROM plants")
+            plant_ids = dict(cur.fetchall())
+
+            cur.executemany(
+                """
+                INSERT INTO recommendations
+                    (run_id, material_id, plant_id, play, order_lines, expected_impact,
+                     rationale, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                [
+                    (
+                        run_id,
+                        material_ids[row["material_code"]],
+                        plant_ids[row["plant_code"]],
+                        row["play"],
+                        Jsonb(row["order_lines"]),
+                        Jsonb(row["expected_impact"]),
+                        Jsonb(row["rationale"]),
+                        row["status"],
+                    )
+                    for row in rows
+                ],
+            )
+
+        cur.execute(
+            "UPDATE recommendations SET status = 'EXPIRED' "
+            "WHERE status = 'PENDING' AND run_id != %s",
+            (run_id,),
+        )
+
+
+def _recommend_sync(run_id: str) -> dict:
+    """F5-AC1/AC3: solve + classify a play for every series this run produced a
+    demand forecast for, and persist the resulting E13 rows. Blocking (MILP +
+    Monte Carlo + DB I/O) — called via asyncio.to_thread so it never blocks the
+    event loop (known pitfall: sync work in async handlers).
+
+    F5-ERR1/ERR3: an ERROR-status series (NO_FEASIBLE_PLAN / SOLVER_TIMEOUT /
+    MODEL_INVALID) persists as a recommendation-level error row — `play` NULL,
+    `status` ERROR, `rationale.error` carries the code + binding constraints
+    (T22 follow-up migration: `recommendation_status` gained ERROR, `play`
+    became nullable with a CHECK pairing the two). The run warning is kept
+    alongside the row so orchestrator-level tooling sees it without a join.
+    """
+    materials = load_materials()
+    grade_family_by_material = dict(zip(materials["code"], materials["grade_family"], strict=True))
+
+    rec_rows: list[dict] = []
+    warnings: list[dict] = []
+
+    for material_code, plant_code in list_series(run_id):
+        grade_family = grade_family_by_material.get(material_code)
+        try:
+            si = assemble_series_inputs(run_id, material_code, plant_code, grade_family)
+        except MissingPriceBandError:
+            # F5-ERR2: no E11 band for this series' grade_family this run —
+            # skip it, warn, keep going; other series are unaffected.
+            warnings.append(
+                {
+                    "code": "MISSING_PRICE_BAND",
+                    "material_code": material_code,
+                    "plant_code": plant_code,
+                    "grade_family": grade_family,
+                }
+            )
+            continue
+        except Exception as exc:  # noqa: BLE001 - one bad series must never crash the stage
+            warnings.append(
+                {
+                    "code": "SERIES_FAILED",
+                    "material_code": material_code,
+                    "plant_code": plant_code,
+                    "detail": str(exc),
+                }
+            )
+            continue
+
+        rec = recommend_series(si)
+
+        if rec["status"] == "ERROR":
+            # F5-ERR1/ERR3: persist the error row (see docstring) and still
+            # warn, so a run-level glance and a recommendations query agree.
+            warnings.append(
+                {**rec["error"], "material_code": material_code, "plant_code": plant_code}
+            )
+            rec_rows.append(
+                {
+                    "material_code": material_code,
+                    "plant_code": plant_code,
+                    "play": None,
+                    "order_lines": [],
+                    "expected_impact": {},
+                    "rationale": {"error": rec["error"]},
+                    "status": "ERROR",
+                }
+            )
+            continue
+
+        rec_rows.append(
+            {
+                "material_code": material_code,
+                "plant_code": plant_code,
+                "play": rec["play"],
+                "order_lines": rec["orderLines"],
+                "expected_impact": rec["expectedImpact"],
+                "rationale": rec["rationale"],
+                "status": rec["status"],
+            }
+        )
+
+    _persist_recommendations(run_id, rec_rows)
+
+    return {"recommendations": len(rec_rows), "warnings": warnings}
+
+
 @router.post("/recommend")
-async def recommend(body: StageRequest) -> dict[str, int]:
-    # ponytail: M1 stub, zero-work counts — T22 replaces this with the real
-    # recommendation generation (persists E13 rows, expires stale PENDING recs).
-    return {"recommendations": 0}
+async def recommend(body: StageRequest) -> dict:
+    return await asyncio.to_thread(_recommend_sync, body.run_id)

@@ -22,17 +22,9 @@ from pdi_engine.recommend.inputs import (
 )
 
 
-def _latest_run_id() -> str:
-    with psycopg.connect(get_settings().database_url) as conn, conn.cursor() as cur:
-        cur.execute("SELECT id FROM runs WHERE status = 'DONE' ORDER BY started_at DESC LIMIT 1")
-        row = cur.fetchone()
-    assert row is not None, "no DONE run seeded — run the pipeline first"
-    return str(row[0])
-
-
 # --- FIX-3 cover scenario --------------------------------------------------- #
-def test_fix3_breach_series_cover_below_floor():
-    si = assemble_series_inputs(_latest_run_id(), "WR-5.5-HC", "RNC", "WR-STD")
+def test_fix3_breach_series_cover_below_floor(pipeline_run_id):
+    si = assemble_series_inputs(pipeline_run_id, "WR-5.5-HC", "RNC", "WR-STD")
     # The invariant that drives the deterministic BUY_NOW: cover below the floor.
     assert si.cover_days < si.policy.min_cover_days  # < 21
     # Near the seeded 18.2d headline, allowing for the forecast-vs-consumption
@@ -40,15 +32,15 @@ def test_fix3_breach_series_cover_below_floor():
     assert si.cover_days == pytest.approx(18.2, rel=0.20)
 
 
-def test_fix3_comfortable_series_cover_above_target():
-    si = assemble_series_inputs(_latest_run_id(), "WR-8-MS", "HSP", "WR-STD")
+def test_fix3_comfortable_series_cover_above_target(pipeline_run_id):
+    si = assemble_series_inputs(pipeline_run_id, "WR-8-MS", "HSP", "WR-STD")
     # Comfortable cover -> deterministic WAIT: above the target, far above floor.
     assert si.cover_days >= si.policy.target_cover_days  # >= 35
     assert si.cover_days == pytest.approx(40.0, rel=0.15)  # measured live ~38.9d
 
 
-def test_fix3_series_inputs_are_well_formed():
-    si = assemble_series_inputs(_latest_run_id(), "WR-5.5-HC", "RNC", "WR-STD")
+def test_fix3_series_inputs_are_well_formed(pipeline_run_id):
+    si = assemble_series_inputs(pipeline_run_id, "WR-5.5-HC", "RNC", "WR-STD")
     assert len(si.demand_p50_mt) == 12
     assert len(si.open_po_mt_by_week) == 12
     assert len(si.price_paths.p50) == 12

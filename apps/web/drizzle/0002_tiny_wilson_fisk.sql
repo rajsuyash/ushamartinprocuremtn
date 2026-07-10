@@ -1,0 +1,1 @@
+ALTER TYPE "public"."recommendation_status" ADD VALUE 'ERROR';

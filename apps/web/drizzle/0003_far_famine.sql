@@ -1,0 +1,2 @@
+ALTER TABLE "recommendations" ALTER COLUMN "play" DROP NOT NULL;--> statement-breakpoint
+ALTER TABLE "recommendations" ADD CONSTRAINT "recommendations_play_null_iff_error" CHECK (("recommendations"."play" IS NULL) = ("recommendations"."status" = 'ERROR'));

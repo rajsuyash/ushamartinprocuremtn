@@ -28,12 +28,15 @@ export const play = pgEnum("play", [
   "SPLIT_SUPPLIERS",
 ]);
 
+// ERROR = F5-ERR1/ERR3 degraded outcome (NO_FEASIBLE_PLAN / SOLVER_TIMEOUT /
+// MODEL_INVALID) — a recommendation-level error row with no play (T22).
 export const recommendationStatus = pgEnum("recommendation_status", [
   "PENDING",
   "APPROVED",
   "OVERRIDDEN",
   "REJECTED",
   "EXPIRED",
+  "ERROR",
 ]);
 
 export const decisionAction = pgEnum("decision_action", [

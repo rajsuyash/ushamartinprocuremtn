@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  check,
   date,
   jsonb,
   pgTable,
@@ -26,24 +27,35 @@ const createdAt = timestamp("created_at", { withTimezone: true })
 
 // E13 · Recommendation — play per series per run. Carries run_id.
 // order_lines / expected_impact / rationale are jsonb blobs (rendered from stored JSON, never recomputed).
-export const recommendations = pgTable("recommendations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  runId: uuid("run_id")
-    .notNull()
-    .references(() => runs.id),
-  materialId: uuid("material_id")
-    .notNull()
-    .references(() => materials.id),
-  plantId: uuid("plant_id")
-    .notNull()
-    .references(() => plants.id),
-  play: play("play").notNull(),
-  orderLines: jsonb("order_lines").notNull().default(sql`'[]'::jsonb`),
-  expectedImpact: jsonb("expected_impact").notNull().default(sql`'{}'::jsonb`),
-  rationale: jsonb("rationale").notNull().default(sql`'{}'::jsonb`),
-  status: recommendationStatus("status").notNull().default("PENDING"),
-  createdAt,
-});
+// `play` is nullable: F5-ERR1/ERR3 degraded series persist as status='ERROR' with no
+// play and order_lines '[]' — the CHECK below keeps that pairing the only legal one.
+export const recommendations = pgTable(
+  "recommendations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    runId: uuid("run_id")
+      .notNull()
+      .references(() => runs.id),
+    materialId: uuid("material_id")
+      .notNull()
+      .references(() => materials.id),
+    plantId: uuid("plant_id")
+      .notNull()
+      .references(() => plants.id),
+    play: play("play"),
+    orderLines: jsonb("order_lines").notNull().default(sql`'[]'::jsonb`),
+    expectedImpact: jsonb("expected_impact").notNull().default(sql`'{}'::jsonb`),
+    rationale: jsonb("rationale").notNull().default(sql`'{}'::jsonb`),
+    status: recommendationStatus("status").notNull().default("PENDING"),
+    createdAt,
+  },
+  (t) => [
+    check(
+      "recommendations_play_null_iff_error",
+      sql`(${t.play} IS NULL) = (${t.status} = 'ERROR')`,
+    ),
+  ],
+);
 
 // E14 · DecisionRecord — immutable human decision. Append-only in the app layer.
 // UNIQUE(recommendation_id) = decide-once; UNIQUE(idempotency_key) = retry-safe.

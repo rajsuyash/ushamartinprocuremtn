@@ -7,11 +7,28 @@ artifacts + the classification flags.
 from __future__ import annotations
 
 from .classifier import Classification
-from .inputs import SeriesInputs
+from .inputs import HORIZON_WEEKS, SeriesInputs, forward_avg_daily_demand
 from .solver import SolveArtifacts
 
+_BUYING_PLAYS = {"BUY_NOW", "PARTIAL_BUY", "SPLIT_SUPPLIERS"}
 
-def _drivers(inputs: SeriesInputs, cls: Classification, wc_relaxed: bool) -> list[dict]:
+
+def _first_projected_breach(inputs: SeriesInputs, start_week: int) -> int | None:
+    """First horizon week (>= earliest achievable arrival) where cover dips below
+    the floor under a no-buy simulation (on-hand + committed open POs only)."""
+    on_hand = inputs.on_hand_mt
+    for t in range(1, HORIZON_WEEKS + 1):
+        on_hand += inputs.open_po_mt_by_week[t - 1] - inputs.demand_p50_mt[t - 1]
+        if t < start_week:
+            continue
+        floor = inputs.policy.min_cover_days * forward_avg_daily_demand(inputs.demand_p50_mt, t)
+        if on_hand < floor:
+            return t
+    return None
+
+
+def _drivers(inputs: SeriesInputs, cls: Classification, art: SolveArtifacts) -> list[dict]:
+    wc_relaxed = art.wc_relaxed
     drivers: list[dict] = []
     if cls.cover_below_floor:
         drivers.append(
@@ -38,6 +55,25 @@ def _drivers(inputs: SeriesInputs, cls: Classification, wc_relaxed: bool) -> lis
         drivers.append(
             {"factor": "WC_CAP_RELAXED", "detail": "working-capital cap relaxed to hold cover floor"}
         )
+
+    # Invariant: a plan that orders always explains why. When cover is between
+    # floor and target and the band is flat, none of the rules above fire — so
+    # derive the real reason from the solve (a projected breach the buy prevents,
+    # else a price opportunity from the band drift). No audit-trail hole.
+    if not drivers and cls.play in _BUYING_PLAYS:
+        breach_week = _first_projected_breach(inputs, art.earliest_arrival)
+        if breach_week is not None:
+            drivers.append(
+                {
+                    "factor": "PROJECTED_COVER_BREACH",
+                    "detail": f"cover dips below {inputs.policy.min_cover_days}d floor at week {breach_week}",
+                }
+            )
+        else:
+            pct = (inputs.price_paths.p50[3] / inputs.spot_inr_mt - 1) * 100
+            drivers.append(
+                {"factor": "PRICE_OPPORTUNITY", "detail": f"P50 {pct:+.1f}% vs spot at 4w"}
+            )
     return drivers
 
 
@@ -63,6 +99,6 @@ def build_rationale(inputs: SeriesInputs, art: SolveArtifacts, cls: Classificati
             "spotInrMt": inputs.spot_inr_mt,
             "spread": {o.supplier_code: o.offer_base_inr for o in inputs.offers},
         },
-        "drivers": _drivers(inputs, cls, art.wc_relaxed),
+        "drivers": _drivers(inputs, cls, art),
         "constraintsRespected": constraints,
     }
