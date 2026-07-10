@@ -26,10 +26,12 @@ type GuardedHandler<P> = (
   ctx: { session: Session; params: P },
 ) => Response | Promise<Response>;
 
-export function withApiAuth<P = undefined>(
+export function withApiAuth<P = Promise<Record<string, never>>>(
   handler: GuardedHandler<P>,
   opts: { roles: readonly Role[] | "authenticated" },
 ) {
+  // Default P matches Next 16's generated route types: params is a Promise even
+  // for routes with no dynamic segments (build-time route validation requires it).
   return async (req: NextRequest, routeCtx?: { params: P }): Promise<Response> => {
     const session = await auth();
 
