@@ -12,6 +12,8 @@ dependencies = [
     "pandas>=3.0.3",
     "lightgbm>=4.6.0",
     "statsmodels>=0.14.6",
+    "ortools>=9.15.6755",
+    "numpy>=2.5.1",
 ]
 
 [dependency-groups]

@@ -1,4 +1,10 @@
-"""F5 play recommendation — input assembly (T20) and, later, solver (T21)."""
+"""F5 play recommendation — input assembly (T20) + solver/classifier (T21)."""
+from .checker import CheckResult, check_solution
+from .classifier import Classification, classify
+from .montecarlo import compute_impact
+from .rationale import build_rationale
+from .recommend import recommend_series
+from .solver import SolveArtifacts, solve_series
 from .inputs import (
     CoverState,
     MissingDemandError,
@@ -24,6 +30,15 @@ from .inputs import (
 )
 
 __all__ = [
+    "CheckResult",
+    "check_solution",
+    "Classification",
+    "classify",
+    "compute_impact",
+    "build_rationale",
+    "recommend_series",
+    "SolveArtifacts",
+    "solve_series",
     "CoverState",
     "MissingDemandError",
     "MissingPriceBandError",
