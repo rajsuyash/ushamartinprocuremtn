@@ -7,6 +7,7 @@ export interface RunWarning {
   code: string;
   material_code?: string;
   plant_code?: string;
+  grade_family?: string;
   stage?: string;
   detail?: string;
 }
@@ -23,4 +24,14 @@ export function hasInsufficientHistoryWarning(
       w.material_code === series.materialCode &&
       w.plant_code === series.plantCode,
   );
+}
+
+/** F4-ERR1: true when the latest run fell back to the random-walk baseline
+ * band for this grade_family — the UI renders a chip alongside the chart
+ * (the band still renders; it just must never pretend model quality). */
+export function hasBaselineFallbackWarning(
+  warnings: readonly RunWarning[],
+  gradeFamily: string,
+): boolean {
+  return warnings.some((w) => w.code === "BASELINE_FALLBACK" && w.grade_family === gradeFamily);
 }

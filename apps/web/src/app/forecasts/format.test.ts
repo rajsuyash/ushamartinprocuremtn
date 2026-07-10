@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatQtyMt } from "./format";
+import { formatPriceInrMt, formatQtyMt } from "./format";
 
 describe("formatQtyMt", () => {
   it("trims trailing zeros but keeps one decimal", () => {
@@ -26,5 +26,22 @@ describe("formatQtyMt", () => {
     expect(formatQtyMt(null)).toBe("—");
     expect(formatQtyMt(undefined)).toBe("—");
     expect(formatQtyMt("not-a-number")).toBe("—");
+  });
+});
+
+describe("formatPriceInrMt", () => {
+  it("groups with Indian lakh/crore commas", () => {
+    expect(formatPriceInrMt(54800)).toBe("54,800");
+    expect(formatPriceInrMt(1234567)).toBe("12,34,567");
+  });
+
+  it("accepts numeric strings", () => {
+    expect(formatPriceInrMt("54800")).toBe("54,800");
+  });
+
+  it("returns an em dash for null/undefined/non-numeric", () => {
+    expect(formatPriceInrMt(null)).toBe("—");
+    expect(formatPriceInrMt(undefined)).toBe("—");
+    expect(formatPriceInrMt("not-a-number")).toBe("—");
   });
 });

@@ -10,3 +10,12 @@ export function formatQtyMt(value: number | string | null | undefined): string {
   const fixed = n.toFixed(3).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, ".0");
   return fixed;
 }
+
+// ₹/MT formatting: integer INR, Indian lakh/crore grouping per conventions.md
+// ("Money display: Intl.NumberFormat('en-IN')") — never manual regex grouping.
+export function formatPriceInrMt(value: number | string | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  const n = typeof value === "string" ? Number(value) : value;
+  if (!Number.isFinite(n)) return "—";
+  return new Intl.NumberFormat("en-IN").format(n);
+}
