@@ -15,8 +15,10 @@ const STAGES = [
   { key: "recommend", path: "/v1/recommend" },
 ] as const;
 
+type StageWarning = { code: string; [key: string]: unknown };
+
 type StageOutcome =
-  | { ok: true; counts: unknown }
+  | { ok: true; counts: unknown; warnings: StageWarning[] }
   | { ok: false; detail: string };
 
 async function callStage(baseUrl: string, path: string, runId: string): Promise<StageOutcome> {
@@ -32,7 +34,16 @@ async function callStage(baseUrl: string, path: string, runId: string): Promise<
       return { ok: false, detail: `stage responded with HTTP ${res.status}` };
     }
 
-    return { ok: true, counts: await res.json() };
+    // Per-stage soft warnings (INSUFFICIENT_HISTORY, SERIES_FAILED, …) belong on
+    // runs.warnings (F3-ERR1 "listed in run warnings"), not nested inside counts —
+    // split them out of the stage body here.
+    const body = (await res.json()) as Record<string, unknown>;
+    const { warnings, ...countsOnly } = body;
+    return {
+      ok: true,
+      counts: countsOnly,
+      warnings: Array.isArray(warnings) ? (warnings as StageWarning[]) : [],
+    };
   } catch (err) {
     // Covers network failure (ECONNREFUSED, DNS), and AbortError from the timeout.
     return { ok: false, detail: err instanceof Error ? err.message : String(err) };
@@ -66,6 +77,7 @@ async function failRun(
 export async function runOrchestrator(runId: string): Promise<void> {
   const db = getDb();
   const counts: Record<string, unknown> = {};
+  const warnings: StageWarning[] = [];
 
   try {
     await db.update(runs).set({ status: "RUNNING", startedAt: new Date() }).where(eq(runs.id, runId));
@@ -85,9 +97,13 @@ export async function runOrchestrator(runId: string): Promise<void> {
       }
 
       counts[stage.key] = outcome.counts;
+      warnings.push(...outcome.warnings.map((w) => ({ ...w, stage: stage.key })));
     }
 
-    await db.update(runs).set({ status: "DONE", finishedAt: new Date(), counts }).where(eq(runs.id, runId));
+    await db
+      .update(runs)
+      .set({ status: "DONE", finishedAt: new Date(), counts, warnings })
+      .where(eq(runs.id, runId));
   } catch (err) {
     console.error(
       JSON.stringify({

@@ -271,9 +271,11 @@
           "acs": [],
           "complexity": "med",
           "model_tier": "sonnet",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "2fe9e96",
+          "verified_layers": [
+            "unit"
+          ]
         },
         {
           "id": "T13",
@@ -286,9 +288,12 @@
           ],
           "complexity": "med",
           "model_tier": "sonnet",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "b401741",
+          "verified_layers": [
+            "unit",
+            "integration"
+          ]
         },
         {
           "id": "T14",
@@ -688,6 +693,8 @@
     "2026-07-10 F1-AC1/AC2/ERR1 browser-verify: 3 PASS (screenshots in verify-artifacts). T6 fully verified at all tagged layers.",
     "2026-07-10 T7 committed dd9bcc9 (83/83 workspace tests; opus review APPROVE; WARN fixed: roles param now mandatory w/ 'authenticated' sentinel). T9||T11 dispatching.",
     "2026-07-10 T9 aff0bf2 + T11 320bc31 committed (61 web tests; T9 opus review APPROVE, 2 WARNs fixed). T10 dispatching \u2014 last M1 task.",
-    "2026-07-10 M1 VERIFIED \u2014 14/14 exit ACs at tagged layers (F2 browser sweep 4 PASS). M2 building: T12 dispatched."
+    "2026-07-10 M1 VERIFIED \u2014 14/14 exit ACs at tagged layers (F2 browser sweep 4 PASS). M2 building: T12 dispatched.",
+    "2026-07-10 T12 committed 2fe9e96 (29 pytest; seed is gapless-weekly so zero-fill rule proven synthetically). T13 dispatched.",
+    "2026-07-10 T13 committed b401741 (44 pytest; all 6 series WAPE 0.034-0.044 <= 0.25; 12.2s backtest). T14 dispatched."
   ]
 }
