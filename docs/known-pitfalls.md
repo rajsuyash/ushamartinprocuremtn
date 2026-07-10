@@ -73,3 +73,4 @@ Read BEFORE writing code. Append (symptom → cause → fix) when you hit a new 
 - Host ports 8000/5432/5433/6379/9000 are owned by other projects (aisewak, athena, sentinel) → PDI uses engine 8100, postgres 5442 (loopback, via `ENGINE_HOST_PORT`/`POSTGRES_HOST_PORT` in .env).
 - Python src-layout + uv: without `[build-system]` (hatchling), `uv sync` never installs the package — imports work locally only via conftest sys.path hack, then crash in Docker.
 - Subagent verification can pass on env vars exported in its own shell — main session re-verifies on a clean env before commit.
+- Runtime `pnpm start` in Docker = corepack fetches pnpm from the network at container start; newer corepack prompts → container exits 0 silently. Run `node_modules/.bin/next start` directly in the runtime stage.

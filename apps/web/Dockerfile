@@ -23,10 +23,12 @@ RUN pnpm --filter @pdi/web build
 
 # Fresh runtime stage — only the built output, no build-time tooling/cache.
 FROM node:22-alpine
-RUN corepack enable
 WORKDIR /repo
 COPY --from=builder /repo /repo
 WORKDIR /repo/apps/web
 
 EXPOSE 3000
-CMD ["pnpm", "start"]
+# No pnpm at runtime: `pnpm start` makes corepack fetch pnpm from the network at
+# CONTAINER START, and newer corepack prompts for confirmation → instant exit 0.
+# The next binary is already in node_modules; invoke it directly.
+CMD ["node_modules/.bin/next", "start"]
