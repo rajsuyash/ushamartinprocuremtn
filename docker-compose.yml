@@ -45,6 +45,9 @@ services:
       AUTH_SECRET: ${AUTH_SECRET}
       ENGINE_URL: http://engine:8000
       APP_ENV: ${APP_ENV:-development}
+      # F9 feature flag (ENV-4/ENV-5): absent/empty ⇒ template mode with visible notice
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      MEMO_MODEL: ${MEMO_MODEL:-claude-sonnet-4-6}
     depends_on:
       postgres:
         condition: service_healthy
