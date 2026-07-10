@@ -9,6 +9,8 @@ import { formatImpactInr } from "../format";
 import { computeImpactBarLayout } from "../impact-bar";
 import { getRecommendationDetail, type ExpectedImpact, type OrderLine } from "../queries";
 
+import { DecisionBar } from "./decision-bar";
+
 interface RecommendationDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -67,9 +69,9 @@ export default async function RecommendationDetailPage({
         </>
       )}
 
-      {/* T26 mounts the approve/override/reject decision bar here — out of scope
-          for this (read-only) detail page. */}
-      <section data-testid="decision-bar-slot" aria-label="Decision actions" />
+      <section data-testid="decision-bar-slot" aria-label="Decision actions">
+        <DecisionBar recommendationId={rec.id} status={rec.status} play={rec.play} />
+      </section>
 
       {rec.decision ? (
         <>
