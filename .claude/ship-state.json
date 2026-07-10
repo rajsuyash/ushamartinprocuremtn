@@ -110,7 +110,7 @@
     },
     {
       "id": "M1",
-      "status": "building",
+      "status": "verified",
       "exit_acs": [
         "F1-AC1",
         "F1-AC2",
@@ -231,7 +231,8 @@
           "status": "verified",
           "commit": "320bc31",
           "verified_layers": [
-            "integration"
+            "integration",
+            "browser-verify"
           ]
         },
         {
@@ -244,15 +245,18 @@
           ],
           "complexity": "med",
           "model_tier": "sonnet",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "c7ce5df",
+          "verified_layers": [
+            "browser-verify"
+          ]
         }
-      ]
+      ],
+      "completed_at": "2026-07-10"
     },
     {
       "id": "M2",
-      "status": "pending",
+      "status": "building",
       "exit_acs": [
         "F3-AC1",
         "F3-AC2",
@@ -683,6 +687,7 @@
     "2026-07-10 T6 committed f109494 (29/29; opus review APPROVE, 2 WARNs fixed: bcrypt timing equalization, no blank-identity sessions). Browser layer pending container rebuild. T7 dispatched.",
     "2026-07-10 F1-AC1/AC2/ERR1 browser-verify: 3 PASS (screenshots in verify-artifacts). T6 fully verified at all tagged layers.",
     "2026-07-10 T7 committed dd9bcc9 (83/83 workspace tests; opus review APPROVE; WARN fixed: roles param now mandatory w/ 'authenticated' sentinel). T9||T11 dispatching.",
-    "2026-07-10 T9 aff0bf2 + T11 320bc31 committed (61 web tests; T9 opus review APPROVE, 2 WARNs fixed). T10 dispatching \u2014 last M1 task."
+    "2026-07-10 T9 aff0bf2 + T11 320bc31 committed (61 web tests; T9 opus review APPROVE, 2 WARNs fixed). T10 dispatching \u2014 last M1 task.",
+    "2026-07-10 M1 VERIFIED \u2014 14/14 exit ACs at tagged layers (F2 browser sweep 4 PASS). M2 building: T12 dispatched."
   ]
 }
