@@ -1,6 +1,9 @@
 # F9 memo evals
 
-Golden set for the weekly memo (PRD §6 F9, FIX-4). Cases marked `"starter": true` are scaffold-generated — expand to the full 10-case FIX-4 set before trusting scores.
+Golden set for the weekly memo (PRD §6 F9, FIX-4). 10 cases, `input` shaped exactly
+like `WeekAggregate` (`apps/web/src/lib/memo/aggregate.ts`) — normal week, zero
+decisions, all-rejected, high alerts, zero runs, negative value, zero alerts, a
+mixed week, plus the two fault-injection cases.
 
 ## Run
 
@@ -8,7 +11,17 @@ Golden set for the weekly memo (PRD §6 F9, FIX-4). Cases marked `"starter": tru
 node evals/run.mjs memo
 ```
 
-Requires the memo generator entrypoint (built in M7): `MEMO_EVAL_CMD` env, default `pnpm --filter web exec tsx src/lib/memo/eval-entry.ts` — reads one case `input` JSON on stdin, writes the memo JSON (with `mode`) on stdout. `"inject"` cases are passed as `INJECT=timeout|invalid-json` env to exercise the fallback chain.
+Uses the memo generator entrypoint `apps/web/src/lib/memo/eval-entry.ts` (T34):
+`MEMO_EVAL_CMD` env, default `pnpm --filter web exec tsx src/lib/memo/eval-entry.ts`
+— reads one case `input` JSON on stdin, writes the memo JSON (with `mode`) on
+stdout. `"inject"` cases are passed as `INJECT=timeout|invalid-json` env, which
+forces the LLM path through a fake failing transport to exercise the real
+retry → template fallback chain — independent of whether `ANTHROPIC_API_KEY` is set.
+
+**Without `ANTHROPIC_API_KEY`**, every non-inject case runs in `TEMPLATE` mode (same
+env-gated `generateMemo` used in production) — schema-validity, headline, and
+forbidden-field checks still run for real; only the LLM-mode p95-latency and
+token/cost figures require a live key to be meaningful.
 
 ## Thresholds (from PRD F9 — change only via human PRD edit)
 

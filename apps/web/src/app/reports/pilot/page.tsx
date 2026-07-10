@@ -2,10 +2,13 @@ import { formatPriceInrMt, formatQtyMt } from "@/app/forecasts/format";
 import { getLatestDoneRun } from "@/app/forecasts/queries";
 import { playChipClass, playChipLabel } from "@/app/recommendations/chips";
 import { ValueChart } from "@/components/charts/value-chart";
+import { auth } from "@/auth";
+import { CAPABILITIES } from "@/auth/access";
 import { computeValueReport, type DecisionValueRow, type ValueRowState } from "@/lib/value/value";
 
 import { formatMoneyInr, formatPct } from "./format";
-import { getDemandQuality, getPriceQuality } from "./queries";
+import { MemoPanel } from "./memo-panel";
+import { getDemandQuality, getLatestMemo, getPriceQuality } from "./queries";
 
 // Baseline formula text — PRD §6 F8 "documented on the report page" and PRD §13
 // Glossary "Baseline". Must render even in the F8-ERR1 empty state, so it's a
@@ -28,12 +31,20 @@ function formatDecidedAt(iso: string): string {
 // server-component pattern — no client fetch, no /api route needed for this
 // page's own render (task card point 1, simplicity bias per PRD §0).
 export default async function PilotReportPage() {
-  const [report, run] = await Promise.all([computeValueReport(), getLatestDoneRun()]);
+  const [report, run, session, latestMemo] = await Promise.all([
+    computeValueReport(),
+    getLatestDoneRun(),
+    auth(),
+    getLatestMemo(),
+  ]);
   const [demandQuality, priceQuality] = run
     ? await Promise.all([getDemandQuality(run.id), getPriceQuality(run.id)])
     : [[], []];
 
   const hasDecisions = report.decisions.length > 0;
+  const canGenerateMemo =
+    !!session?.user?.role &&
+    (CAPABILITIES.MUTATE_DATA as readonly string[]).includes(session.user.role);
 
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-8">
@@ -67,6 +78,8 @@ export default async function PilotReportPage() {
       )}
 
       <ForecastQualityPanel demandQuality={demandQuality} priceQuality={priceQuality} hasRun={!!run} />
+
+      <MemoPanel initialMemo={latestMemo} canGenerate={canGenerateMemo} />
     </main>
   );
 }

@@ -1,7 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
+import type { MemoContent } from "@pdi/shared";
 
 import { getDb } from "@/db/client";
-import { demandForecasts, materials, plants, priceForecasts } from "@/db/schema";
+import { demandForecasts, materials, memos, plants, priceForecasts } from "@/db/schema";
 
 import { dedupeDemandQuality, type DemandQualityRow } from "./quality";
 
@@ -51,4 +52,31 @@ export async function getPriceQuality(runId: string): Promise<GradeQualityRow[]>
     gradeFamily: r.gradeFamily,
     coverage8090: r.coverage8090 !== null ? Number(r.coverage8090) : null,
   }));
+}
+
+export interface LatestMemo {
+  id: string;
+  mode: "LLM" | "TEMPLATE";
+  modelId: string | null;
+  content: MemoContent;
+  createdAt: string;
+}
+
+/** Most recently generated memo, if any (T34 "show latest stored memo on page
+ * load"). One row — no pagination needed, this is a single-slot "latest" read. */
+export async function getLatestMemo(): Promise<LatestMemo | null> {
+  const db = getDb();
+  const [row] = await db
+    .select()
+    .from(memos)
+    .orderBy(desc(memos.createdAt))
+    .limit(1);
+  if (!row) return null;
+  return {
+    id: row.id,
+    mode: row.mode,
+    modelId: row.modelId,
+    content: row.content as MemoContent,
+    createdAt: row.createdAt.toISOString(),
+  };
 }

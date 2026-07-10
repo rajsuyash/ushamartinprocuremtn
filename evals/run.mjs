@@ -22,10 +22,31 @@ const schema = JSON.parse(readFileSync(path.join("prompts", "weekly-memo.schema.
 const cmd = process.env.MEMO_EVAL_CMD || "pnpm --filter web exec tsx src/lib/memo/eval-entry.ts";
 const [bin, ...args] = cmd.split(" ");
 
-// Forbidden-field scan (PRD F9 safety): none of these may appear in memo output.
-const FORBIDDEN = [/@pdi\.test/i, /password/i, /ANTHROPIC_API_KEY/i, /AUTH_SECRET/i, /DATABASE_URL/i];
+// Forbidden-field scan (PRD F9 safety): none of these may appear in either the
+// assembled input (the "prompt payload" — the aggregate JSON the model/template
+// sees) or the generated output. Named-secret patterns catch the obvious cases;
+// the generic email/"note"/env-value checks catch anything a golden case or a
+// future model response smuggles in without needing an exact literal match.
+const FORBIDDEN_LITERAL = [/@pdi\.test/i, /password/i, /ANTHROPIC_API_KEY/i, /AUTH_SECRET/i, /DATABASE_URL/i];
+const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/;
+const NOTE_RE = /\bnote\b/i;
+// ponytail: 6-char floor on env values keeps trivial env vars (e.g. NODE_ENV=test)
+// from false-positiving against ordinary words in generated text.
+const ENV_VALUES = Object.values(process.env).filter((v) => typeof v === "string" && v.length >= 6);
+
+function forbiddenHits(text) {
+  let hits = FORBIDDEN_LITERAL.filter((re) => re.test(text)).length;
+  if (EMAIL_RE.test(text)) hits += 1;
+  if (NOTE_RE.test(text)) hits += 1;
+  hits += ENV_VALUES.filter((v) => text.includes(v)).length;
+  return hits;
+}
 
 // Minimal schema check for the memo contract — required keys, types, max lengths/items.
+// Mirrors packages/shared/src/memo.ts's `memoContentSchema` (zod), which MUST stay in
+// lockstep with this JSON Schema artifact (see that file's header comment) — this
+// runner is a plain `node` script (no TS loader), so it validates against the JSON
+// Schema mirror rather than importing the zod module directly.
 function validate(memo) {
   const errs = [];
   for (const k of schema.required) if (!(k in memo)) errs.push(`missing ${k}`);
@@ -39,11 +60,12 @@ function validate(memo) {
 
 const results = [];
 for (const c of cases) {
+  const inputText = JSON.stringify(c.input);
   const started = Date.now();
   let out, memo, errs;
   try {
     out = execFileSync(bin, args, {
-      input: JSON.stringify(c.input),
+      input: inputText,
       env: { ...process.env, ...(c.inject ? { INJECT: c.inject } : {}) },
       timeout: 30000,
       encoding: "utf8",
@@ -55,8 +77,7 @@ for (const c of cases) {
     continue;
   }
   const latencyMs = Date.now() - started;
-  const text = JSON.stringify(memo);
-  const leaks = FORBIDDEN.filter((re) => re.test(text)).length;
+  const leaks = forbiddenHits(inputText) + forbiddenHits(JSON.stringify(memo));
   const fallbackOk = c.expected.fallbackMode ? memo.mode === c.expected.fallbackMode : true;
   const ok = errs.length === 0 && leaks === 0 && memo.headline?.length > 0 && fallbackOk;
   results.push({ id: c.id, ok, errs, leaks, latencyMs, mode: memo.mode });
@@ -64,16 +85,37 @@ for (const c of cases) {
 
 const n = results.length;
 const valid = results.filter((r) => r.ok).length;
-const latencies = results.map((r) => r.latencyMs ?? 0).sort((a, b) => a - b);
-const p95 = latencies[Math.min(n - 1, Math.ceil(n * 0.95) - 1)] ?? 0;
+
+// p95 latency budget is an LLM-mode concern (PRD F9 "Latency budget ... per memo"
+// — a template render or a fault-injection round-trip is not the thing being
+// budgeted). Template-only runs (no ANTHROPIC_API_KEY) trivially pass with p95 0.
+const llmLatencies = results.filter((r) => r.mode === "LLM").map((r) => r.latencyMs).sort((a, b) => a - b);
+const p95 = llmLatencies.length
+  ? llmLatencies[Math.min(llmLatencies.length - 1, Math.ceil(llmLatencies.length * 0.95) - 1)]
+  : 0;
+
 const report = {
   feature,
   cases: n,
   schemaValidRate: valid / n,
   p95LatencyMs: p95,
+  llmModeCases: llmLatencies.length,
   thresholds: { schemaValidRate: 0.95, p95LatencyMs: 8000 },
   pass: valid / n >= 0.95 && p95 <= 8000,
   results,
 };
 console.log(JSON.stringify(report, null, 2));
+
+// Cost/token log line (PRD F9 "Cost ≤ $0.05/memo" + known-pitfalls "log mode/model/
+// latency ... never full prompts"). The transport (client.ts) doesn't surface token
+// usage today, so an LLM-mode run notes that rather than fabricating a number;
+// template-mode runs (the default without ANTHROPIC_API_KEY) note that plainly —
+// there is no API cost to report.
+const llmCases = results.filter((r) => r.mode === "LLM").length;
+if (llmCases > 0) {
+  console.log(`[cost] ${llmCases}/${n} case(s) ran in LLM mode — token/cost not exposed by the transport.`);
+} else {
+  console.log(`[cost] all ${n} case(s) ran in TEMPLATE mode (no ANTHROPIC_API_KEY) — $0 API cost.`);
+}
+
 process.exit(report.pass ? 0 : 1);
