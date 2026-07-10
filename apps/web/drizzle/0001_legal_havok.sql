@@ -1,0 +1,1 @@
+ALTER TABLE "upload_batches" ADD COLUMN "staged_rows" jsonb DEFAULT '[]'::jsonb NOT NULL;

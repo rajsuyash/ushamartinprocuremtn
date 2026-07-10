@@ -32,6 +32,12 @@ export const uploadBatches = pgTable("upload_batches", {
   rows: integer("rows").notNull().default(0),
   validRows: integer("valid_rows").notNull().default(0),
   errors: jsonb("errors").notNull().default(sql`'[]'::jsonb`),
+  // Staged VALID rows (post syntactic + reference validation), snake_case-keyed
+  // ParsedRows. Persisting them on the batch row (vs a staging table) is the
+  // simplest thing that survives a server restart: commit re-reads them, resolves
+  // FK ids from codes, and inserts into the target table (T9). Empty once nothing
+  // is left to stage.
+  stagedRows: jsonb("staged_rows").notNull().default(sql`'[]'::jsonb`),
   uploadedBy: uuid("uploaded_by")
     .notNull()
     .references(() => users.id),
