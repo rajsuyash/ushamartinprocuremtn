@@ -4,8 +4,26 @@
 
 export type Role = "viewer" | "buyer" | "admin" | "approver";
 
+// PRD F1 role matrix as named capability groups — the single source of truth for
+// route-handler guards. Later tasks pass CAPABILITIES.X to withApiAuth instead of
+// ad-hoc role arrays.
+export const CAPABILITIES = {
+  /** View dashboards, forecasts, recs, alerts, reports — all four roles. */
+  VIEW: ["viewer", "buyer", "approver", "admin"],
+  /** Upload data, trigger runs. */
+  MUTATE_DATA: ["buyer", "approver", "admin"],
+  /** Decide recommendations (approve/override/reject). */
+  DECIDE: ["buyer", "approver", "admin"],
+  /** Edit policy (/settings/policy). */
+  EDIT_POLICY: ["approver", "admin"],
+  /** Manage users. */
+  MANAGE_USERS: ["admin"],
+} as const satisfies Record<string, readonly Role[]>;
+
+export type Capability = keyof typeof CAPABILITIES;
+
 // /settings/policy is approver/admin only (PRD F1 role matrix).
-export const POLICY_EDIT_ROLES: readonly Role[] = ["approver", "admin"];
+export const POLICY_EDIT_ROLES: readonly Role[] = CAPABILITIES.EDIT_POLICY;
 
 export function canEditPolicy(role: Role | undefined | null): boolean {
   return !!role && POLICY_EDIT_ROLES.includes(role);

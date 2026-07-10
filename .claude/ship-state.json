@@ -178,9 +178,13 @@
           ],
           "complexity": "high",
           "model_tier": "opus",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "f109494",
+          "verified_layers": [
+            "unit",
+            "integration",
+            "browser-verify"
+          ]
         },
         {
           "id": "T7",
@@ -668,6 +672,8 @@
     "2026-07-10 M0 VERIFIED (SKEL-AC1 browser PASS, SKEL-AC2 integration PASS) at a3ef085; M1 starting",
     "2026-07-10 T4 committed 7ac79a2 (12/12 tests vs live pg; note: upload_batch_id NOT NULL -> T5 must create seed UploadBatch)",
     "2026-07-10 T8 committed 5fae1f7 (39/39; XLSX non-streaming fallback documented \u2014 exceljs streaming reader broken on node25; @types/node dedupe deferred until no parallel lockfile writers)",
-    "2026-07-10 T5 committed aa775c9 (4/4 tests; FIX-3: 18.20d/40.00d, band rising; per-day determinism documented). T6 dispatched."
+    "2026-07-10 T5 committed aa775c9 (4/4 tests; FIX-3: 18.20d/40.00d, band rising; per-day determinism documented). T6 dispatched.",
+    "2026-07-10 T6 committed f109494 (29/29; opus review APPROVE, 2 WARNs fixed: bcrypt timing equalization, no blank-identity sessions). Browser layer pending container rebuild. T7 dispatched.",
+    "2026-07-10 F1-AC1/AC2/ERR1 browser-verify: 3 PASS (screenshots in verify-artifacts). T6 fully verified at all tagged layers."
   ]
 }

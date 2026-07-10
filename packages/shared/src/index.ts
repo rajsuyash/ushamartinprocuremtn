@@ -1,3 +1,4 @@
+export * from "./envelope";
 export * from "./ingest";
 
 // ponytail: packages/shared grows further real modules (zod schemas, casing
