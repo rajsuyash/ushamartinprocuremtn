@@ -18,6 +18,8 @@ COPY apps/web/next.config.ts apps/web/tsconfig.json apps/web/postcss.config.mjs 
 COPY apps/web/src apps/web/src
 COPY packages/shared/src packages/shared/src
 COPY packages/shared/tsconfig.json packages/shared/tsconfig.json
+# F9 prompt artifacts — read at runtime from <cwd>/../../prompts (= /repo/prompts)
+COPY prompts prompts
 
 RUN pnpm --filter @pdi/web build
 
