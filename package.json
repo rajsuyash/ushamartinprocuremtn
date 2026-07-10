@@ -8,6 +8,15 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "lint": "pnpm -r --if-present lint",
     "test": "pnpm -r --if-present test",
-    "seed": "node -e \"const e = new Error('SEED_NOT_IMPLEMENTED: real seed data ships in task T5'); e.name = 'SeedNotImplementedError'; throw e;\""
+    "test:seed": "vitest run seed",
+    "seed": "tsx seed/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "26.1.1",
+    "bcryptjs": "^3.0.2",
+    "postgres": "^3.4.9",
+    "tsx": "^4.20.6",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
   }
 }
