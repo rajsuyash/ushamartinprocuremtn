@@ -43,7 +43,7 @@ afterAll(async () => {
 });
 
 describe("runOrchestrator", () => {
-  it("F2-AC3: all three stages succeed -> Run DONE with counts from each stage", async () => {
+  it("F2-AC3: all four stages succeed -> Run DONE with counts from each stage", async () => {
     const runId = await insertRun();
 
     global.fetch = vi.fn(async (input: string | URL | Request) => {
@@ -57,6 +57,9 @@ describe("runOrchestrator", () => {
       if (url.endsWith("/v1/recommend")) {
         return new Response(JSON.stringify({ recommendations: 2 }), { status: 200 });
       }
+      if (url.endsWith("/v1/alerts")) {
+        return new Response(JSON.stringify({ alerts: 1 }), { status: 200 });
+      }
       throw new Error(`unexpected stage URL: ${url}`);
     }) as unknown as typeof fetch;
 
@@ -69,6 +72,7 @@ describe("runOrchestrator", () => {
       demand: { series: 5, forecasts: 5 },
       price: { series: 3, bands: 3 },
       recommend: { recommendations: 2 },
+      alerts: { alerts: 1 },
     });
     expect(run.warnings).toEqual([]);
 

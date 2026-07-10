@@ -13,6 +13,7 @@ const STAGES = [
   { key: "demand", path: "/v1/forecast/demand" },
   { key: "price", path: "/v1/forecast/price" },
   { key: "recommend", path: "/v1/recommend" },
+  { key: "alerts", path: "/v1/alerts" },
 ] as const;
 
 type StageWarning = { code: string; [key: string]: unknown };

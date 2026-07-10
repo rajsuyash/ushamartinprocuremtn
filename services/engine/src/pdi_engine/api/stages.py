@@ -1,8 +1,8 @@
 """Run-stage endpoints (T11, EXECUTION_PLAN D3).
 
 The web-side orchestrator (apps/web/src/lib/run-orchestrator.ts) calls these in order:
-demand forecast -> price forecast -> recommend. All three (T14, T17, T22) are real
-implementations persisting E10/E11/E13 rows.
+demand forecast -> price forecast -> recommend -> alerts. All four (T14, T17, T22, T28)
+are real implementations persisting E10/E11/E13/E15 rows.
 """
 from __future__ import annotations
 
@@ -15,11 +15,20 @@ from psycopg.types.json import Jsonb
 from pydantic import BaseModel, field_validator
 
 from ..config import get_settings
+from ..data.db import query_df
 from ..data.readers import load_consumption, load_market_prices, load_materials
 from ..data.weekly import to_iso_weekly, weekly_prices
 from ..demand.select import InsufficientHistoryError, run_series
 from ..price.select import BASELINE_FALLBACK, QUANTILE_REPAIRED, run_grade_family
-from ..recommend.inputs import MissingPriceBandError, assemble_series_inputs, list_series
+from ..recommend.classifier import HEDGE_SPREAD
+from ..recommend.inputs import (
+    MissingDemandError,
+    MissingPriceBandError,
+    SeriesInputs,
+    assemble_series_inputs,
+    list_series,
+)
+from ..recommend.rationale import _first_projected_breach
 from ..recommend.recommend import recommend_series
 
 router = APIRouter(prefix="/v1", tags=["run-stages"])
@@ -368,3 +377,238 @@ def _recommend_sync(run_id: str) -> dict:
 @router.post("/recommend")
 async def recommend(body: StageRequest) -> dict:
     return await asyncio.to_thread(_recommend_sync, body.run_id)
+
+
+# --------------------------------------------------------------------------- #
+# T28 — F7 risk alerts (E15), the final run stage.
+# --------------------------------------------------------------------------- #
+COVER_BREACH_WINDOW_WEEKS = 4  # F7: "projected within 4 weeks"
+BAND_WIDENING_THRESHOLD = HEDGE_SPREAD  # reuse F5's 0.08 band-width constant, don't redefine
+PRICE_SPIKE_THRESHOLD = 0.03  # F7: w/w move > 3%; "move" read as absolute (either direction)
+
+
+def _persist_alerts(run_id: str, rows: list[dict]) -> None:
+    """Delete-and-rewrite this run_id's alerts rows — same per-run idempotency
+    pattern as demand/price/recommend (PRD §7 invariant)."""
+    with psycopg.connect(get_settings().database_url) as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM alerts WHERE run_id = %s", (run_id,))
+        if not rows:
+            return
+
+        cur.execute("SELECT code, id FROM materials")
+        material_ids = dict(cur.fetchall())
+        cur.execute("SELECT code, id FROM plants")
+        plant_ids = dict(cur.fetchall())
+
+        cur.executemany(
+            """
+            INSERT INTO alerts
+                (run_id, type, severity, material_id, plant_id, payload, status)
+            VALUES (%s, %s, %s, %s, %s, %s, 'OPEN')
+            """,
+            [
+                (
+                    run_id,
+                    row["type"],
+                    row["severity"],
+                    material_ids[row["material_code"]] if row["material_code"] else None,
+                    plant_ids[row["plant_code"]] if row["plant_code"] else None,
+                    Jsonb(row["payload"]),
+                )
+                for row in rows
+            ],
+        )
+
+
+def _recommendation_id_for(run_id: str, material_code: str, plant_code: str) -> str | None:
+    """This run's recommendation id for a series — links COVER_BREACH -> rec (F7-AC1)."""
+    df = query_df(
+        """
+        SELECT r.id
+        FROM recommendations r
+        JOIN materials m ON m.id = r.material_id
+        JOIN plants p ON p.id = r.plant_id
+        WHERE r.run_id = %(run_id)s AND m.code = %(material_code)s AND p.code = %(plant_code)s
+        """,
+        {"run_id": run_id, "material_code": material_code, "plant_code": plant_code},
+    )
+    return str(df.iloc[0].id) if not df.empty else None
+
+
+def _cover_breach_alert(run_id: str, si: SeriesInputs) -> dict | None:
+    """COVER_BREACH: CRITICAL if cover is already below the policy floor now,
+    WARN if a no-buy simulation projects a breach within the next 4 weeks.
+    Reuses rationale._first_projected_breach — the same projection T21 already
+    uses to justify a defensive BUY_NOW — rather than re-deriving it here."""
+    policy = si.policy
+    if si.cover_days < policy.min_cover_days:
+        severity, breach_week = "CRITICAL", 0
+    else:
+        breach_week = _first_projected_breach(si, start_week=1)
+        if breach_week is None or breach_week > COVER_BREACH_WINDOW_WEEKS:
+            return None
+        severity = "WARN"
+
+    return {
+        "type": "COVER_BREACH",
+        "severity": severity,
+        "material_code": si.material_code,
+        "plant_code": si.plant_code,
+        "payload": {
+            "coverDays": round(si.cover_days, 1),
+            "minCoverDays": policy.min_cover_days,
+            "breachWeek": breach_week,
+            "recommendationId": _recommendation_id_for(run_id, si.material_code, si.plant_code),
+        },
+    }
+
+
+def _conc_breach_alerts(si: SeriesInputs) -> list[dict]:
+    """CONC_BREACH: trailing-90d supplier share > policy cap, per supplier
+    (supplier-scoped — PRD §6 F7). Reuses `si.share_denominator`, already
+    computed once in SQL by T20's assemble_series_inputs — no duplicate query."""
+    denom = si.share_denominator
+    if denom.total_mt <= 0:
+        return []
+
+    cap_fraction = si.policy.max_supplier_share_pct / 100.0
+    alerts: list[dict] = []
+    for supplier_code, qty_mt in denom.per_supplier_mt.items():
+        share = qty_mt / denom.total_mt
+        if share > cap_fraction:
+            alerts.append(
+                {
+                    "type": "CONC_BREACH",
+                    "severity": "WARN",
+                    "material_code": si.material_code,
+                    "plant_code": si.plant_code,
+                    "payload": {
+                        "supplierCode": supplier_code,
+                        "sharePct": round(share * 100, 1),
+                        "capPct": si.policy.max_supplier_share_pct,
+                        "trailingQtyMt": round(qty_mt, 3),
+                        "totalQtyMt": round(denom.total_mt, 3),
+                    },
+                }
+            )
+    return alerts
+
+
+def _band_widening_alerts(run_id: str) -> list[dict]:
+    """BAND_WIDENING: (P90-P10)/P50 > 8% at the 4w horizon, per grade_family, on
+    this run's own E11 rows. Severity WARN — chosen (not INFO) because >8% at
+    4w is the same threshold T21's classifier treats as material enough to be
+    HEDGE_LOCK-eligible (recommend/classifier.py HEDGE_SPREAD), so it warrants
+    more than an informational flag. Grade-family-scoped: material/plant NULL."""
+    df = query_df(
+        """
+        SELECT grade_family, p10_inr_mt, p50_inr_mt, p90_inr_mt
+        FROM price_forecasts
+        WHERE run_id = %(run_id)s AND horizon_weeks = 4
+        """,
+        {"run_id": run_id},
+    )
+    alerts: list[dict] = []
+    for row in df.itertuples():
+        spread = (row.p90_inr_mt - row.p10_inr_mt) / row.p50_inr_mt
+        if spread > BAND_WIDENING_THRESHOLD:
+            alerts.append(
+                {
+                    "type": "BAND_WIDENING",
+                    "severity": "WARN",
+                    "material_code": None,
+                    "plant_code": None,
+                    "payload": {
+                        "gradeFamily": row.grade_family,
+                        "horizonWeeks": 4,
+                        "spreadPct": round(spread * 100, 1),
+                        "p10InrMt": int(row.p10_inr_mt),
+                        "p50InrMt": int(row.p50_inr_mt),
+                        "p90InrMt": int(row.p90_inr_mt),
+                    },
+                }
+            )
+    return alerts
+
+
+def _price_spike_alerts() -> list[dict]:
+    """PRICE_SPIKE: latest weekly market index w/w move > 3% per grade_family,
+    over committed market_prices (not run-scoped — this is a data-driven alert,
+    same source data used by F4's own weekly bucketing)."""
+    prices = load_market_prices()
+    alerts: list[dict] = []
+    if prices.empty:
+        return alerts
+
+    for grade_family in sorted(prices["grade_family"].unique()):
+        weekly = weekly_prices(prices, grade_family=grade_family)
+        if len(weekly) < 2:
+            continue
+        prev = float(weekly["price_inr_mt"].iloc[-2])
+        latest = float(weekly["price_inr_mt"].iloc[-1])
+        if prev <= 0:
+            continue
+        move = (latest - prev) / prev
+        if abs(move) > PRICE_SPIKE_THRESHOLD:
+            alerts.append(
+                {
+                    "type": "PRICE_SPIKE",
+                    "severity": "WARN",
+                    "material_code": None,
+                    "plant_code": None,
+                    "payload": {
+                        "gradeFamily": grade_family,
+                        "wowMovePct": round(move * 100, 1),
+                        "prevInrMt": int(round(prev)),
+                        "latestInrMt": int(round(latest)),
+                    },
+                }
+            )
+    return alerts
+
+
+def _alerts_sync(run_id: str) -> dict:
+    """F7-AC1/AC2, F7-ERR2: evaluate all four alert types over committed data +
+    this run's outputs, persist E15 rows. A per-series failure never crashes
+    the stage — same per-series tolerance as demand/price/recommend."""
+    materials = load_materials()
+    grade_family_by_material = dict(zip(materials["code"], materials["grade_family"], strict=True))
+
+    alert_rows: list[dict] = []
+    warnings: list[dict] = []
+
+    for material_code, plant_code in list_series(run_id):
+        grade_family = grade_family_by_material.get(material_code)
+        try:
+            si = assemble_series_inputs(run_id, material_code, plant_code, grade_family)
+        except (MissingPriceBandError, MissingDemandError):
+            # Same series already skipped/warned by the recommend stage — no
+            # cover/share machinery available for it here either.
+            continue
+        except Exception as exc:  # noqa: BLE001 - one bad series must never crash the stage
+            warnings.append(
+                {
+                    "code": "SERIES_FAILED",
+                    "material_code": material_code,
+                    "plant_code": plant_code,
+                    "detail": str(exc),
+                }
+            )
+            continue
+
+        cover_alert = _cover_breach_alert(run_id, si)
+        if cover_alert:
+            alert_rows.append(cover_alert)
+        alert_rows.extend(_conc_breach_alerts(si))
+
+    alert_rows.extend(_band_widening_alerts(run_id))
+    alert_rows.extend(_price_spike_alerts())
+
+    _persist_alerts(run_id, alert_rows)
+
+    return {"alerts": len(alert_rows), "warnings": warnings}
+
+
+@router.post("/alerts")
+async def alerts(body: StageRequest) -> dict:
+    return await asyncio.to_thread(_alerts_sync, body.run_id)
