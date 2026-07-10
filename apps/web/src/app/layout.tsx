@@ -29,6 +29,9 @@ export default async function RootLayout({
               <Link href="/data" className="font-medium text-gray-700 hover:underline">
                 Data
               </Link>
+              <Link href="/forecasts" className="font-medium text-gray-700 hover:underline">
+                Forecasts
+              </Link>
             </div>
           </nav>
         ) : null}
