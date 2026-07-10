@@ -134,9 +134,11 @@
           "acs": [],
           "complexity": "high",
           "model_tier": "opus",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "7ac79a2",
+          "verified_layers": [
+            "unit"
+          ]
         },
         {
           "id": "T8",
@@ -146,9 +148,11 @@
           ],
           "complexity": "med",
           "model_tier": "sonnet",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "5fae1f7",
+          "verified_layers": [
+            "unit"
+          ]
         },
         {
           "id": "T5",
@@ -156,9 +160,12 @@
           "acs": [],
           "complexity": "high",
           "model_tier": "opus",
-          "status": "pending",
-          "commit": null,
-          "verified_layers": []
+          "status": "verified",
+          "commit": "aa775c9",
+          "verified_layers": [
+            "unit",
+            "integration"
+          ]
         },
         {
           "id": "T6",
@@ -658,6 +665,9 @@
     "2026-07-09 PRD v1.1 (Appendix B only: version resolution + delegated decisions) \u2014 sha updated to e5480c2c",
     "2026-07-09 T1 committed b146bcc (typecheck/lint/test/build 0; /login 200 w/ form; Next 16 divergence -> PRD v1.1). T3 dispatched.",
     "2026-07-09 T3 committed cbec2cf; code+unit green; LIVE verify blocked: Docker daemon needs human GUI approval. Engine host port 8100 (8000 busy).",
-    "2026-07-10 M0 VERIFIED (SKEL-AC1 browser PASS, SKEL-AC2 integration PASS) at a3ef085; M1 starting"
+    "2026-07-10 M0 VERIFIED (SKEL-AC1 browser PASS, SKEL-AC2 integration PASS) at a3ef085; M1 starting",
+    "2026-07-10 T4 committed 7ac79a2 (12/12 tests vs live pg; note: upload_batch_id NOT NULL -> T5 must create seed UploadBatch)",
+    "2026-07-10 T8 committed 5fae1f7 (39/39; XLSX non-streaming fallback documented \u2014 exceljs streaming reader broken on node25; @types/node dedupe deferred until no parallel lockfile writers)",
+    "2026-07-10 T5 committed aa775c9 (4/4 tests; FIX-3: 18.20d/40.00d, band rising; per-day determinism documented). T6 dispatched."
   ]
 }

@@ -185,6 +185,9 @@ describe("PRD §7 DB invariants (hostile set)", () => {
   it("rejects a second active PolicyConfig while one is active — partial unique index", async () => {
     const err = await inRollbackTx(async (tx) => {
       const userId = await seedUser(tx);
+      // Seed data may already hold the one allowed active policy — deactivate
+      // inside this rolled-back tx so the test owns the invariant it asserts.
+      await tx`update policy_configs set is_active = false where is_active = true`;
       const insert = (sp: TransactionSql) => sp`
         insert into policy_configs
           (min_cover_days, target_cover_days, max_supplier_share_pct, service_level_pct, is_active, created_by)
