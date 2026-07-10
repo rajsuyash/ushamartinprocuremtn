@@ -14,6 +14,11 @@ export type ErrorCode =
   | "ALREADY_COMMITTED"
   | "ALREADY_DECIDED"
   | "NOTE_REQUIRED"
+  // F6 decision input (T25): override.play missing on an OVERRIDE, and a decision
+  // attempt on a recommendation that is neither PENDING nor already-decided
+  // (EXPIRED / ERROR) — distinct from ALREADY_DECIDED so the UI can message each.
+  | "OVERRIDE_PLAY_REQUIRED"
+  | "DECISION_NOT_ALLOWED"
   | "ENGINE_UNAVAILABLE"
   // ponytail: T11 — one recompute at a time; 409 when a run is already QUEUED/RUNNING.
   | "RUN_IN_PROGRESS"
