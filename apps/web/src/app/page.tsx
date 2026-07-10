@@ -1,14 +1,11 @@
 import Link from "next/link";
 
 import { auth, signOut } from "@/auth";
+import { getOpenAlertCount } from "@/app/alerts/queries";
 
 import { formatPriceInrMt } from "./forecasts/format";
 import { getDashboardTiles, getLatestDoneRun, type DashboardTile } from "./queries";
 import { bestSupplierOffer, classifyBandDirection, isCoverBreach, type BandDirection } from "./tile-logic";
-
-// ponytail: F7 (M6) wires the real open-alert count into this slot. Zero here is a
-// clean seam, not fake data — never render a fabricated non-zero count.
-const ALERT_COUNT_PLACEHOLDER = 0;
 
 const DIRECTION_ARROW: Record<BandDirection, string> = {
   rising: "↑",
@@ -46,6 +43,7 @@ export default async function HomePage({
 
   const run = await getLatestDoneRun();
   const tiles = run ? await getDashboardTiles(run.id) : [];
+  const openAlertCount = await getOpenAlertCount();
 
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-8">
@@ -65,13 +63,14 @@ export default async function HomePage({
           <p className="font-medium">{user?.name ?? user?.email}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span
-            data-testid="alert-count"
+          <Link
+            href="/alerts"
+            data-testid="alert-bell"
             className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
             title="Open alerts"
           >
-            {ALERT_COUNT_PLACEHOLDER} alerts
-          </span>
+            {openAlertCount} alerts
+          </Link>
           <span
             data-testid="role-chip"
             className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
