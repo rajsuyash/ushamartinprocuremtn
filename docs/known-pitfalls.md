@@ -66,3 +66,10 @@ Read BEFORE writing code. Append (symptom → cause → fix) when you hit a new 
 - Unbounded retries → cost blowup; retry cap 1 + 10s timeout, then template fallback.
 - Model output used without schema validation → validate → fallback, never crash.
 - Forbidden fields (emails, notes, contract terms, env values) in the prompt → scrub at the assembly boundary; string-scan in evals.
+
+## Local infra (this machine — discovered M0)
+
+- Docker builds fail "docker-credential-desktop not found" → non-login shell PATH → prefix `/Applications/Docker.app/Contents/Resources/bin`.
+- Host ports 8000/5432/5433/6379/9000 are owned by other projects (aisewak, athena, sentinel) → PDI uses engine 8100, postgres 5442 (loopback, via `ENGINE_HOST_PORT`/`POSTGRES_HOST_PORT` in .env).
+- Python src-layout + uv: without `[build-system]` (hatchling), `uv sync` never installs the package — imports work locally only via conftest sys.path hack, then crash in Docker.
+- Subagent verification can pass on env vars exported in its own shell — main session re-verifies on a clean env before commit.

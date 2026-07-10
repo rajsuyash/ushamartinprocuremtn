@@ -54,7 +54,7 @@
   "milestones": [
     {
       "id": "M0",
-      "status": "building",
+      "status": "verified",
       "exit_acs": [
         "SKEL-AC1",
         "SKEL-AC2"
@@ -97,17 +97,20 @@
           ],
           "complexity": "med",
           "model_tier": "sonnet",
-          "status": "in_progress",
+          "status": "verified",
           "commit": "cbec2cf",
           "verified_layers": [
-            "unit"
+            "unit",
+            "integration",
+            "browser-verify"
           ]
         }
-      ]
+      ],
+      "completed_at": "2026-07-10"
     },
     {
       "id": "M1",
-      "status": "pending",
+      "status": "building",
       "exit_acs": [
         "F1-AC1",
         "F1-AC2",
@@ -621,7 +624,30 @@
       ]
     }
   ],
-  "failures": [],
+  "failures": [
+    {
+      "task": "T3",
+      "type": "infrastructure",
+      "attempts": [
+        {
+          "hypothesis": "credential helper missing from PATH",
+          "fix_summary": "prefix Docker.app Resources/bin",
+          "result": "build ok"
+        },
+        {
+          "hypothesis": "host ports taken by other projects",
+          "fix_summary": "engine->8100, postgres->5442",
+          "result": "up"
+        },
+        {
+          "hypothesis": "pdi_engine not installed in image (no build-system)",
+          "fix_summary": "hatchling build-system + uv lock",
+          "result": "healthy"
+        }
+      ],
+      "escalated": false
+    }
+  ],
   "log": [
     "2026-07-09 state initialized from EXECUTION_PLAN.md \u00a7J (approved, sha 0a7dbca6)",
     "2026-07-09T00:30:00+05:30 G1 approved",
@@ -631,6 +657,7 @@
     "2026-07-09 T2 committed 0bc8736 (6 pytest green on clean env; fixed import-time env load + sync-in-async ping \u2014 session review)",
     "2026-07-09 PRD v1.1 (Appendix B only: version resolution + delegated decisions) \u2014 sha updated to e5480c2c",
     "2026-07-09 T1 committed b146bcc (typecheck/lint/test/build 0; /login 200 w/ form; Next 16 divergence -> PRD v1.1). T3 dispatched.",
-    "2026-07-09 T3 committed cbec2cf; code+unit green; LIVE verify blocked: Docker daemon needs human GUI approval. Engine host port 8100 (8000 busy)."
+    "2026-07-09 T3 committed cbec2cf; code+unit green; LIVE verify blocked: Docker daemon needs human GUI approval. Engine host port 8100 (8000 busy).",
+    "2026-07-10 M0 VERIFIED (SKEL-AC1 browser PASS, SKEL-AC2 integration PASS) at a3ef085; M1 starting"
   ]
 }

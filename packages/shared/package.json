@@ -10,7 +10,12 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@types/papaparse": "^5.5.2",
     "typescript": "6.0.3",
     "vitest": "4.1.10"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "papaparse": "^5.5.4"
   }
 }
