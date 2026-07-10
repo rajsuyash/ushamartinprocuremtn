@@ -9,6 +9,7 @@ dependencies = [
     "uvicorn[standard]",
     "pydantic>=2.0",
     "psycopg[binary]",
+    "pandas>=3.0.3",
 ]
 
 [dependency-groups]
