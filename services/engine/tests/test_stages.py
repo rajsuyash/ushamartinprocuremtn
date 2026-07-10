@@ -1,6 +1,7 @@
 """Tests for the M1 run-stage stubs (T11). `/v1/forecast/demand` got its real
-implementation in T14 (see test_forecast_demand.py); price/recommend remain
-M1 stubs here until T17/T22 land.
+implementation in T14 (see test_forecast_demand.py) and `/v1/forecast/price`
+in T17 (see test_forecast_price.py); `recommend` remains an M1 stub here
+until T22 lands.
 """
 import pytest
 from fastapi.testclient import TestClient
@@ -15,25 +16,14 @@ def client():
     return TestClient(app)
 
 
-@pytest.mark.parametrize(
-    ("path", "expected_body"),
-    [
-        ("/v1/forecast/price", {"series": 0, "bands": 0}),
-        ("/v1/recommend", {"recommendations": 0}),
-    ],
-)
-def test_stage_stub_returns_zero_work_counts(client, path, expected_body):
-    response = client.post(path, json={"run_id": RUN_ID})
+def test_stage_stub_returns_zero_work_counts(client):
+    response = client.post("/v1/recommend", json={"run_id": RUN_ID})
 
     assert response.status_code == 200
-    assert response.json() == expected_body
+    assert response.json() == {"recommendations": 0}
 
 
-@pytest.mark.parametrize(
-    "path",
-    ["/v1/forecast/price", "/v1/recommend"],
-)
-def test_stage_stub_422_on_missing_run_id(client, path):
-    response = client.post(path, json={})
+def test_stage_stub_422_on_missing_run_id(client):
+    response = client.post("/v1/recommend", json={})
 
     assert response.status_code == 422

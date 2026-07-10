@@ -1,9 +1,9 @@
 """Run-stage endpoints (T11, EXECUTION_PLAN D3).
 
 The web-side orchestrator (apps/web/src/lib/run-orchestrator.ts) calls these in order:
-demand forecast -> price forecast -> recommend. `/forecast/demand` is the real T14
-implementation (persists E10 rows); price/recommend remain M1 stateless stubs
-until T17/T22 land.
+demand forecast -> price forecast -> recommend. `/forecast/demand` (T14) and
+`/forecast/price` (T17) are real implementations persisting E10/E11 rows;
+`recommend` remains an M1 stateless stub until T22 lands.
 """
 from __future__ import annotations
 
@@ -15,9 +15,10 @@ from fastapi import APIRouter
 from pydantic import BaseModel, field_validator
 
 from ..config import get_settings
-from ..data.readers import load_consumption
-from ..data.weekly import to_iso_weekly
+from ..data.readers import load_consumption, load_market_prices
+from ..data.weekly import to_iso_weekly, weekly_prices
 from ..demand.select import InsufficientHistoryError, run_series
+from ..price.select import BASELINE_FALLBACK, QUANTILE_REPAIRED, run_grade_family
 
 router = APIRouter(prefix="/v1", tags=["run-stages"])
 
@@ -139,11 +140,101 @@ async def forecast_demand(body: StageRequest) -> dict:
     return await asyncio.to_thread(_forecast_demand_sync, body.run_id)
 
 
+def _persist_price_forecasts(run_id: str, rows: list[dict]) -> None:
+    """Delete-and-rewrite this run_id's price_forecasts rows — same per-run
+    idempotency pattern as demand_forecasts (PRD §7 invariant)."""
+    with psycopg.connect(get_settings().database_url) as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM price_forecasts WHERE run_id = %s", (run_id,))
+        if not rows:
+            return
+
+        cur.executemany(
+            """
+            INSERT INTO price_forecasts
+                (run_id, grade_family, horizon_weeks, p10_inr_mt, p50_inr_mt, p90_inr_mt,
+                 coverage_8090, pinball)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            [
+                (
+                    run_id,
+                    row["grade_family"],
+                    row["horizon_weeks"],
+                    row["p10_inr_mt"],
+                    row["p50_inr_mt"],
+                    row["p90_inr_mt"],
+                    row["coverage_8090"],
+                    row["pinball"],
+                )
+                for row in rows
+            ],
+        )
+
+
+def _forecast_price_sync(run_id: str) -> dict:
+    """F4-AC1: band-forecast every grade_family at 1w/4w/12w horizons and
+    persist rows. Blocking (pandas/LightGBM + DB I/O) — called via
+    asyncio.to_thread from the async handler so it never blocks the event
+    loop (known pitfall: sync work in async handlers)."""
+    prices = load_market_prices()
+    grade_families = sorted(prices["grade_family"].unique())
+
+    band_rows: list[dict] = []
+    warnings: list[dict] = []
+    n_succeeded = 0
+
+    for grade_family in grade_families:
+        weekly = weekly_prices(prices, grade_family=grade_family)
+
+        try:
+            result = run_grade_family(weekly)
+        except Exception as exc:  # noqa: BLE001 - one bad grade family must never crash the stage
+            warnings.append(
+                {"code": "SERIES_FAILED", "grade_family": grade_family, "detail": str(exc)}
+            )
+            continue
+
+        n_succeeded += 1
+        if result["baseline_fallback"]:
+            # F4-ERR1: too little history for the quantile model — fell back
+            # to the random-walk baseline band, flagged rather than hidden.
+            warnings.append({"code": BASELINE_FALLBACK, "grade_family": grade_family})
+        if result["quantile_repaired_count"]:
+            # F4-ERR2: raw quantiles crossed and were monotonic-repaired.
+            warnings.append(
+                {
+                    "code": QUANTILE_REPAIRED,
+                    "grade_family": grade_family,
+                    "count": result["quantile_repaired_count"],
+                }
+            )
+
+        for band in result["bands"]:
+            p10, p50, p90 = band["p10_inr_mt"], band["p50_inr_mt"], band["p90_inr_mt"]
+            assert p10 <= p50 <= p90, (
+                f"F4 band-order invariant violated for {grade_family} "
+                f"h={band['horizon_weeks']}w: p10={p10} p50={p50} p90={p90}"
+            )
+            band_rows.append(
+                {
+                    "grade_family": grade_family,
+                    "horizon_weeks": band["horizon_weeks"],
+                    "p10_inr_mt": p10,
+                    "p50_inr_mt": p50,
+                    "p90_inr_mt": p90,
+                    "coverage_8090": band["coverage_8090"],
+                    "pinball": band["pinball"],
+                }
+            )
+
+    _persist_price_forecasts(run_id, band_rows)
+
+    return {"gradeFamilies": n_succeeded, "bands": len(band_rows), "warnings": warnings}
+
+
 @router.post("/forecast/price")
-async def forecast_price(body: StageRequest) -> dict[str, int]:
-    # ponytail: M1 stub, zero-work counts — T17 replaces this with the real price-band
-    # forecast (persists E11 rows, p10<=p50<=p90 invariant).
-    return {"series": 0, "bands": 0}
+async def forecast_price(body: StageRequest) -> dict:
+    return await asyncio.to_thread(_forecast_price_sync, body.run_id)
 
 
 @router.post("/recommend")
