@@ -16,4 +16,6 @@ RUN uv sync --frozen --no-dev
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "pdi_engine.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Bind host is env-driven: docker compose uses the IPv4 default; Railway private
+# networking is IPv6-only, so its deploy sets UVICORN_HOST="::".
+CMD ["sh", "-c", "uv run uvicorn pdi_engine.main:app --host ${UVICORN_HOST:-0.0.0.0} --port 8000"]
