@@ -18,7 +18,9 @@ import type { GeneratedMemo } from "./generate";
 export const DEFAULT_MEMO_MODEL = "claude-sonnet-4-6";
 const TIMEOUT_MS = 10_000;
 const MAX_ATTEMPTS = 2; // initial + 1 retry (PRD F9 "retry once")
-const MAX_TOKENS = 2048; // headroom for a ≤2500-char summaryMd + the rest of the JSON
+// Bounded output ⇒ bounded latency: the 10s timeout (PRD F9) is only meetable if the
+// model can't ramble. ~1024 tokens covers the target ~900-char summary + JSON scaffolding.
+const MAX_TOKENS = 1024;
 const INVALID_PAYLOAD_LOG_CHARS = 500;
 
 // Repo-root prompt artifact. cwd is `apps/web` under both `next` (dev/prod) and
@@ -97,10 +99,18 @@ async function callWithTimeout(
   }
 }
 
+/** Models routinely wrap JSON in markdown code fences despite instructions;
+ * strip them before parsing rather than failing the attempt. */
+function stripCodeFences(raw: string): string {
+  const trimmed = raw.trim();
+  const fenced = /^```(?:json)?\s*\n?([\s\S]*?)\n?```\s*$/.exec(trimmed);
+  return fenced ? fenced[1] : trimmed;
+}
+
 /** Parse + schema-validate one raw model output. Throws on invalid JSON or schema
  * violation so the caller treats it as a failed attempt (retry, then fallback). */
 function parseMemoOutput(raw: string): MemoContent {
-  const json: unknown = JSON.parse(raw);
+  const json: unknown = JSON.parse(stripCodeFences(raw));
   return memoContentSchema.parse(json);
 }
 

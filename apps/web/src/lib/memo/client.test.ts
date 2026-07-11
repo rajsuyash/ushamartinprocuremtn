@@ -80,6 +80,16 @@ describe("generateLlmMemo — happy path", () => {
     expect(transport).toHaveBeenCalledTimes(1);
   });
 
+  it("markdown-fenced JSON output is unwrapped, not treated as invalid", async () => {
+    const fenced: MemoTransport = vi.fn(
+      async () => "```json\n" + JSON.stringify(VALID_MEMO) + "\n```",
+    );
+    const result = await generateLlmMemo(AGGREGATE, { transport: fenced });
+    expect(result.mode).toBe("LLM");
+    expect(result.content.headline).toBe(VALID_MEMO.headline);
+    expect(fenced).toHaveBeenCalledTimes(1);
+  });
+
   it("uses MEMO_MODEL env when set", async () => {
     process.env.MEMO_MODEL = "claude-opus-4-8";
     const result = await generateLlmMemo(AGGREGATE, { transport: okTransport() });

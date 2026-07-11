@@ -29,10 +29,17 @@ const [bin, ...args] = cmd.split(" ");
 // future model response smuggles in without needing an exact literal match.
 const FORBIDDEN_LITERAL = [/@pdi\.test/i, /password/i, /ANTHROPIC_API_KEY/i, /AUTH_SECRET/i, /DATABASE_URL/i];
 const EMAIL_RE = /[\w.+-]+@[\w-]+\.[\w.-]+/;
-const NOTE_RE = /\bnote\b/i;
-// ponytail: 6-char floor on env values keeps trivial env vars (e.g. NODE_ENV=test)
-// from false-positiving against ordinary words in generated text.
-const ENV_VALUES = Object.values(process.env).filter((v) => typeof v === "string" && v.length >= 6);
+// A leaked decision note arrives as a JSON field (`"note": "..."`), not as the
+// English word "note" in generated prose — match the field key, not the word,
+// or every model output that says "Note:" false-positives.
+const NOTE_RE = /"notes?"\s*:/i;
+// Scan only secret-bearing env vars: the memo deliberately echoes non-secret config
+// (modelId = MEMO_MODEL per the PRD audit contract), so scanning every env value
+// false-positives on it. 6-char floor keeps trivial values from matching prose.
+const SECRET_ENV_NAME = /KEY|SECRET|TOKEN|PASSWORD|DATABASE_URL/i;
+const ENV_VALUES = Object.entries(process.env)
+  .filter(([k, v]) => SECRET_ENV_NAME.test(k) && typeof v === "string" && v.length >= 6)
+  .map(([, v]) => v);
 
 function forbiddenHits(text) {
   let hits = FORBIDDEN_LITERAL.filter((re) => re.test(text)).length;

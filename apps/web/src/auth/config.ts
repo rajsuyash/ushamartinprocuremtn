@@ -9,6 +9,9 @@ import type { Role } from "./access";
 export default {
   // trustHost is required off-Vercel (docker/localhost) or Auth.js rejects the host.
   trustHost: true,
+  // PRD §11/ENV-6: Secure cookies must not depend on proxy header detection —
+  // a plain-http production deploy would otherwise ship non-Secure session cookies.
+  useSecureCookies: process.env.APP_ENV === "production",
   pages: { signIn: "/login" },
   session: { strategy: "jwt" },
   providers: [],

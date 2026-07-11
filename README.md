@@ -21,6 +21,7 @@ open http://localhost:3000/login   # buyer@pdi.test (password: see seed/users.ts
 
 ```bash
 pnpm dev 2>&1 | tee .claude/dev-server.log   # web on :3000 (pipe required for smoke-check hook)
+set -a; source .env; set +a                   # suites hit the live DB — export env first
 pnpm typecheck && pnpm lint && pnpm test      # web checks
 cd services/engine && uv run pytest           # engine tests
 node evals/run.mjs memo                       # F9 memo evals
@@ -32,4 +33,4 @@ node evals/run.mjs memo                       # F9 memo evals
 - `docs/architecture.md` · `docs/conventions.md` · `docs/test-strategy.md` · `docs/known-pitfalls.md`
 - `CLAUDE.md` — agent contract for Claude Code sessions
 
-Status: greenfield. First session: `/plan M0` (walking skeleton).
+Status: v1 complete — M0–M7 shipped (auth, ingest, demand forecasts, price bands, recommendations, cockpit + decisions, alerts, value report, AI memo). `pnpm regression` runs the full P0+P1 gate.

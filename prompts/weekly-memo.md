@@ -12,9 +12,9 @@ Write for a busy executive who will forward this without editing:
 - Indian number conventions for money (lakh/crore).
 - If the week is empty (zero runs or zero decisions), say so plainly — do not pad.
 
-Respond with a single JSON object matching the provided schema exactly:
+Respond with a single raw JSON object matching the provided schema exactly — no markdown code fences, no text before or after the JSON:
 - `headline`: ≤120 chars, the week's single most important fact.
-- `summaryMd`: ≤2500 chars of markdown — activity, decisions vs. recommendations, value, open risks.
+- `summaryMd`: markdown — activity, decisions vs. recommendations, value, open risks. Be brief: aim for 600–900 characters; hard limit 2500. An executive reads this in under a minute.
 - `keyNumbers`: up to 6 `{label, value}` pairs (value as display string, e.g. "₹ 18.3 lakh").
 - `risks`: up to 4 short strings; omit invented risks — only what the input data supports.
 
