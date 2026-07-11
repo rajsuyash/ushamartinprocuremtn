@@ -727,9 +727,9 @@ Conventions used throughout:
 
 ### Open questions (agent must NOT resolve these)
 
-- [ ] TODO: Pilot scope selection — which client material code and plant map to the pilot series (product supports several; the pilot contract names one grade, one plant).
-- [ ] TODO: Baseline formula sign-off — the v1 formula (decision-month average market price) must be countersigned by client finance before go-live; if they insist on a different counterfactual, F8 math changes.
-- [ ] TODO: Should `HEDGE_LOCK` be visible in the pilot UI, or hidden until the client confirms they have contract instruments to act on it?
+- [x] RESOLVED (2026-07-11, product owner): Pilot series = `WR-5.5-HC · RNC` (demo default; re-confirm when the client SAP extract arrives and remap if the contract names a different grade/plant).
+- [ ] TODO (narrowed 2026-07-11): Baseline formula — v1 formula stays as built (product-owner decision); client-finance countersign still pending before go-live. Only reopens F8 math if finance rejects it.
+- [x] RESOLVED (2026-07-11, product owner): `HEDGE_LOCK` is visible in the pilot UI, rendered like any play with its memo-only rationale (no execution path exists regardless — §3 non-goal).
 
 ### Assumptions register
 
