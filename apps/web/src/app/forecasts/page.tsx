@@ -57,7 +57,12 @@ export default async function ForecastsPage({ searchParams }: ForecastsPageProps
 
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-8">
-      <h1 className="text-lg font-semibold">Forecasts</h1>
+      <div>
+        <h1 className="text-lg font-semibold">Forecasts</h1>
+        <p className="text-sm text-gray-500">
+          Expected demand and the likely market price range for the weeks ahead.
+        </p>
+      </div>
 
       <nav className="flex gap-4 border-b border-gray-200 text-sm" aria-label="Forecast type">
         {TABS.map((t) => (

@@ -34,10 +34,15 @@ export default async function DataPage() {
 
   return (
     <main className="mx-auto max-w-3xl space-y-8 p-8">
-      <h1 className="text-lg font-semibold">Data</h1>
+      <div>
+        <h1 className="text-lg font-semibold">Data</h1>
+        <p className="text-sm text-gray-500">
+          Bring in your SAP exports and market prices, then run the weekly analysis.
+        </p>
+      </div>
 
       <section data-testid="dataset-status" className="space-y-2">
-        <h2 className="text-sm font-medium text-gray-700">Dataset status</h2>
+        <h2 className="text-sm font-medium text-gray-700">Committed data</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {TYPES.map((type) => {
             const s = byType.get(type);
@@ -52,10 +57,21 @@ export default async function DataPage() {
             );
           })}
         </div>
+        <p className="text-sm text-gray-500">
+          Already committed for this week?{" "}
+          <a href="#run" className="underline">
+            Skip to step 3 and trigger a run.
+          </a>
+        </p>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium text-gray-700">Templates</h2>
+        <h2 className="text-sm font-medium text-gray-700">
+          Step 1–2 · Upload, fix errors &amp; commit
+        </h2>
+        <p className="text-sm text-gray-600">
+          Export from SAP (or fill a template) and upload one file per type. Need the format?
+        </p>
         <ul className="flex flex-wrap gap-3 text-sm">
           {TYPES.map((type) => (
             <li key={type}>
@@ -72,15 +88,20 @@ export default async function DataPage() {
           Dates: DD-MM-YYYY or YYYY-MM-DD are both accepted; an ambiguous date
           (e.g. 03-04-2026) is assumed DD-MM.
         </p>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-sm font-medium text-gray-700">Upload</h2>
+        <p className="text-sm text-gray-600">
+          After upload you&apos;ll see a validation preview — fix any flagged rows in your file
+          and re-upload, then commit the clean data.
+        </p>
         <UploadPanel />
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-sm font-medium text-gray-700">Run</h2>
+      <section id="run" className="space-y-2">
+        <h2 className="text-sm font-medium text-gray-700">Step 3 · Trigger a run</h2>
+        <p className="text-sm text-gray-600">
+          A run uses everything committed so far to produce fresh demand forecasts, price
+          outlooks and one recommendation per material. When it finishes, results appear on the
+          dashboard.
+        </p>
         <RunTrigger />
       </section>
     </main>

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { getOpenAlertCount } from "@/app/alerts/queries";
 import { auth } from "@/auth";
+import { NavLinks } from "@/components/nav-links";
 
 import "./globals.css";
 
@@ -16,22 +17,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  const openAlertCount = session?.user ? await getOpenAlertCount() : 0;
 
   return (
     <html lang="en">
       <body>
         {session?.user ? (
           <nav className="border-b border-gray-200 px-8 py-3">
-            <div className="mx-auto flex max-w-3xl gap-4 text-sm">
-              <Link href="/" className="font-medium text-gray-700 hover:underline">
-                Dashboard
-              </Link>
-              <Link href="/data" className="font-medium text-gray-700 hover:underline">
-                Data
-              </Link>
-              <Link href="/forecasts" className="font-medium text-gray-700 hover:underline">
-                Forecasts
-              </Link>
+            <div className="mx-auto max-w-4xl text-sm">
+              <NavLinks
+                role={session.user.role}
+                openAlertCount={openAlertCount}
+                userLabel={session.user.name ?? session.user.email ?? ""}
+              />
             </div>
           </nav>
         ) : null}

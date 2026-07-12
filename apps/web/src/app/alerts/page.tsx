@@ -20,7 +20,12 @@ export default async function AlertsPage() {
 
   return (
     <main className="mx-auto max-w-4xl space-y-8 p-8">
-      <h1 className="text-lg font-semibold">Alerts</h1>
+      <div>
+        <h1 className="text-lg font-semibold">Alerts</h1>
+        <p className="text-sm text-gray-500">
+          Early warnings on stock cover, supplier concentration and price moves.
+        </p>
+      </div>
 
       {rows.length === 0 ? (
         <p className="text-sm text-gray-500" data-testid="alerts-empty">

@@ -63,7 +63,12 @@ export default async function RecommendationsPage({ searchParams }: Recommendati
 
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-8">
-      <h1 className="text-lg font-semibold">Recommendations</h1>
+      <div>
+        <h1 className="text-lg font-semibold">Recommendations</h1>
+        <p className="text-sm text-gray-500">
+          What PDI suggests you buy — approve, change, or reject each one.
+        </p>
+      </div>
 
       <div className="flex flex-wrap gap-6 text-sm" data-testid="recommendation-filters">
         <FilterGroup

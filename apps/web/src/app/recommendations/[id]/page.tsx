@@ -37,7 +37,7 @@ export default async function RecommendationDetailPage({
         <div>
           <p className="text-sm text-gray-500">
             <Link href="/recommendations" className="underline">
-              Recommendations
+              ← All recommendations
             </Link>
           </p>
           <h1 className="text-lg font-semibold">
