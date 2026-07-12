@@ -11,11 +11,11 @@ describe("playChipClass", () => {
   });
 
   it("falls back to a neutral class for a null play (ERROR rows)", () => {
-    expect(playChipClass(null)).toBe("bg-gray-100 text-gray-500");
+    expect(playChipClass(null)).toBe("bg-surface-alt text-muted");
   });
 
   it("falls back to a neutral class for an unrecognized value", () => {
-    expect(playChipClass("NOT_A_PLAY")).toBe("bg-gray-100 text-gray-500");
+    expect(playChipClass("NOT_A_PLAY")).toBe("bg-surface-alt text-muted");
   });
 });
 
@@ -38,6 +38,6 @@ describe("statusChipClass", () => {
   });
 
   it("falls back to a neutral class for an unrecognized value", () => {
-    expect(statusChipClass("NOT_A_STATUS")).toBe("bg-gray-100 text-gray-700");
+    expect(statusChipClass("NOT_A_STATUS")).toBe("bg-surface-alt text-muted");
   });
 });

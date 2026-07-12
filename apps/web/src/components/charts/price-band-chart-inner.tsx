@@ -71,8 +71,8 @@ export default function PriceBandChartInner({ data }: PriceBandChartProps) {
             stackId="band"
             name="P10–P90 (decision band)"
             stroke="none"
-            fill="#93c5fd"
-            fillOpacity={0.4}
+            fill="#1a2b3c"
+            fillOpacity={0.15}
             connectNulls
             isAnimationActive={false}
           />
@@ -80,7 +80,7 @@ export default function PriceBandChartInner({ data }: PriceBandChartProps) {
             type="monotone"
             dataKey="p50"
             name="Forecast (P50)"
-            stroke="#2563eb"
+            stroke="#eb6a1b"
             strokeDasharray="5 5"
             dot
             connectNulls
@@ -90,7 +90,7 @@ export default function PriceBandChartInner({ data }: PriceBandChartProps) {
             type="monotone"
             dataKey="price"
             name="Market price"
-            stroke="#374151"
+            stroke="#1a2b3c"
             dot={false}
             isAnimationActive={false}
           />

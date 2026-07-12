@@ -53,7 +53,7 @@ export function AckButton({ alertId }: AckButtonProps) {
   return (
     <div className="flex flex-col items-end gap-1">
       {notice ? (
-        <p role="alert" data-testid="ack-error" className="text-xs text-amber-800">
+        <p role="alert" data-testid="ack-error" className="text-xs text-warn">
           {notice}
         </p>
       ) : null}
@@ -62,7 +62,7 @@ export function AckButton({ alertId }: AckButtonProps) {
         data-action="ack-alert"
         disabled={phase === "submitting"}
         onClick={() => void ack()}
-        className="rounded border border-gray-300 px-3 py-1 text-xs disabled:opacity-50"
+        className="rounded border border-border px-3 py-1 text-xs disabled:opacity-50"
       >
         {phase === "submitting" ? "Acknowledging…" : "Acknowledge"}
       </button>

@@ -22,21 +22,21 @@ export default async function AlertsPage() {
     <main className="mx-auto max-w-4xl space-y-8 p-8">
       <div>
         <h1 className="text-lg font-semibold">Alerts</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           Early warnings on stock cover, supplier concentration and price moves.
         </p>
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-sm text-gray-500" data-testid="alerts-empty">
+        <p className="text-sm text-muted" data-testid="alerts-empty">
           No alerts.
         </p>
       ) : (
         <>
           <section className="space-y-3" data-testid="alerts-open">
-            <h2 className="text-sm font-medium text-gray-700">Open</h2>
+            <h2 className="text-sm font-medium text-muted">Open</h2>
             {open.length === 0 ? (
-              <p className="text-sm text-gray-500">No open alerts.</p>
+              <p className="text-sm text-muted">No open alerts.</p>
             ) : (
               <ul className="space-y-2">
                 {open.map((a) => (
@@ -48,7 +48,7 @@ export default async function AlertsPage() {
 
           {acked.length > 0 ? (
             <section className="space-y-3" data-testid="alerts-acked">
-              <h2 className="text-sm font-medium text-gray-700">Acknowledged</h2>
+              <h2 className="text-sm font-medium text-muted">Acknowledged</h2>
               <ul className="space-y-2">
                 {acked.map((a) => (
                   <AlertRow key={a.id} alert={a} />
@@ -66,7 +66,7 @@ function AlertRow({ alert }: { alert: AlertListRow }) {
   return (
     <li
       data-testid={`alert-${alert.id}`}
-      className="flex items-start justify-between gap-4 rounded border border-gray-200 p-3 text-sm"
+      className="flex items-start justify-between gap-4 rounded-xl border border-border bg-surface p-3 text-sm"
     >
       <div className="space-y-1">
         <div className="flex flex-wrap items-center gap-2">
@@ -75,27 +75,27 @@ function AlertRow({ alert }: { alert: AlertListRow }) {
           >
             {alert.severity}
           </span>
-          <span className="font-medium text-gray-900">{alert.type}</span>
+          <span className="font-medium text-ink">{alert.type}</span>
           {alert.materialCode && alert.plantCode ? (
-            <span className="text-gray-500">
+            <span className="text-muted">
               {alert.materialCode} · {alert.plantCode}
             </span>
           ) : null}
         </div>
 
-        <p className="text-gray-700">{summarizeAlertPayload(alert.type, alert.payload)}</p>
+        <p className="text-muted">{summarizeAlertPayload(alert.type, alert.payload)}</p>
 
         {alert.recommendationId ? (
           <Link
             href={`/recommendations/${alert.recommendationId}`}
-            className="block text-xs text-blue-700 underline"
+            className="block text-xs text-secondary underline"
           >
             View recommendation
           </Link>
         ) : null}
 
         {alert.status === "ACKED" ? (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted">
             Acknowledged by {alert.ackedByEmail} at {formatTimestamp(alert.ackedAt)}
           </p>
         ) : null}

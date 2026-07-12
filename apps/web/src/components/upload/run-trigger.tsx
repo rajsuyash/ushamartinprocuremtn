@@ -98,7 +98,7 @@ export function RunTrigger() {
         data-action="trigger-run"
         disabled={triggering || isInFlight}
         onClick={() => void trigger()}
-        className="rounded bg-gray-900 px-3 py-1 text-sm text-white disabled:opacity-50"
+        className="rounded bg-primary px-3 py-1 text-sm text-white disabled:opacity-50"
       >
         Trigger run
       </button>
@@ -106,26 +106,26 @@ export function RunTrigger() {
       {run ? (
         <span
           data-testid="run-status"
-          className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+          className="rounded-full bg-surface-alt px-3 py-1 text-xs font-medium text-muted"
         >
           {run.status}
         </span>
       ) : message ? (
-        <span data-testid="run-status" className="text-xs text-gray-500">
+        <span data-testid="run-status" className="text-xs text-muted">
           {message}
         </span>
       ) : null}
 
       {run?.status === "FAILED" ? (
         <>
-          <span className="text-xs text-red-700">
+          <span className="text-xs text-risk">
             {failure?.code ?? "ENGINE_UNAVAILABLE"}
           </span>
           <button
             type="button"
             data-action="retry-run"
             onClick={() => void trigger()}
-            className="rounded border border-gray-400 px-3 py-1 text-xs"
+            className="rounded border border-border px-3 py-1 text-xs"
           >
             Retry
           </button>

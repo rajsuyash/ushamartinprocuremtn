@@ -10,7 +10,7 @@ import type { DemandChartProps } from "./demand-chart-inner";
 const DemandChartInner = dynamic(() => import("./demand-chart-inner"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-72 items-center justify-center text-sm text-gray-400">
+    <div className="flex h-72 items-center justify-center text-sm text-muted">
       Loading chart…
     </div>
   ),

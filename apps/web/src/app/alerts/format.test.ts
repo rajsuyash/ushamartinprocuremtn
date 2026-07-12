@@ -45,12 +45,12 @@ describe("summarizeAlertPayload", () => {
 
 describe("severityChipClass", () => {
   it("maps CRITICAL/WARN/INFO to distinct classes", () => {
-    expect(severityChipClass("CRITICAL")).toContain("red");
-    expect(severityChipClass("WARN")).toContain("amber");
-    expect(severityChipClass("INFO")).toContain("gray");
+    expect(severityChipClass("CRITICAL")).toContain("risk");
+    expect(severityChipClass("WARN")).toContain("warn");
+    expect(severityChipClass("INFO")).toContain("muted");
   });
 
   it("falls back to a neutral class for an unrecognized severity", () => {
-    expect(severityChipClass("WEIRD")).toBe("bg-gray-100 text-gray-600");
+    expect(severityChipClass("WEIRD")).toBe("bg-surface-alt text-muted");
   });
 });

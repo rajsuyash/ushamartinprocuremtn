@@ -126,7 +126,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
         <p
           role="alert"
           data-testid="decision-stale-notice"
-          className="rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+          className="rounded border border-warn bg-warn-surface px-3 py-2 text-sm text-warn"
         >
           {staleNotice}
         </p>
@@ -139,7 +139,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
               type="button"
               data-action="approve"
               onClick={() => openModal("APPROVE")}
-              className="rounded bg-green-700 px-3 py-1 text-sm text-white"
+              className="rounded bg-positive px-3 py-1 text-sm text-white"
             >
               Approve
             </button>
@@ -147,7 +147,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
               type="button"
               data-action="override"
               onClick={() => openModal("OVERRIDE")}
-              className="rounded bg-blue-700 px-3 py-1 text-sm text-white"
+              className="rounded bg-secondary px-3 py-1 text-sm text-white"
             >
               Override
             </button>
@@ -155,7 +155,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
               type="button"
               data-action="reject"
               onClick={() => openModal("REJECT")}
-              className="rounded bg-red-700 px-3 py-1 text-sm text-white"
+              className="rounded bg-risk px-3 py-1 text-sm text-white"
             >
               Reject
             </button>
@@ -169,14 +169,14 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
               data-testid="decision-modal"
               className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 p-4"
             >
-              <div className="w-full max-w-md space-y-3 rounded bg-white p-4 shadow-lg">
+              <div className="w-full max-w-md space-y-3 rounded-xl bg-surface p-4 shadow-lg">
                 <h2 className="text-sm font-semibold">
                   {ACTION_LABEL[openAction]} recommendation
                 </h2>
 
                 {openAction === "OVERRIDE" ? (
                   <div className="space-y-1">
-                    <label htmlFor="override-play" className="text-xs text-gray-500">
+                    <label htmlFor="override-play" className="text-xs text-muted">
                       Replacement play (system play: {play ?? "ERROR"})
                     </label>
                     <select
@@ -185,7 +185,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
                       value={overridePlay}
                       disabled={phase === "submitting"}
                       onChange={(e) => setOverridePlay(e.target.value as Play)}
-                      className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                      className="w-full rounded border border-border px-2 py-1 text-sm"
                     >
                       {PLAYS.map((p) => (
                         <option key={p} value={p}>
@@ -197,7 +197,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
                 ) : null}
 
                 <div className="space-y-1">
-                  <label htmlFor="decision-note" className="text-xs text-gray-500">
+                  <label htmlFor="decision-note" className="text-xs text-muted">
                     Note{" "}
                     {openAction === "APPROVE"
                       ? "(optional)"
@@ -213,17 +213,17 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
                       setNoteTouched(true);
                     }}
                     rows={3}
-                    className="w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                    className="w-full rounded border border-border px-2 py-1 text-sm"
                   />
                   {noteTouched && !noteValid ? (
-                    <p role="alert" data-testid="note-error" className="text-xs text-red-700">
+                    <p role="alert" data-testid="note-error" className="text-xs text-risk">
                       A note of at least {DECISION_NOTE_MIN_LENGTH} characters is required.
                     </p>
                   ) : null}
                 </div>
 
                 {submitError ? (
-                  <p role="alert" data-testid="decision-error" className="text-xs text-red-700">
+                  <p role="alert" data-testid="decision-error" className="text-xs text-risk">
                     {submitError}
                   </p>
                 ) : null}
@@ -234,7 +234,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
                     data-action="cancel-decision"
                     disabled={phase === "submitting"}
                     onClick={closeModal}
-                    className="rounded border border-gray-300 px-3 py-1 text-sm disabled:opacity-50"
+                    className="rounded border border-border px-3 py-1 text-sm disabled:opacity-50"
                   >
                     Cancel
                   </button>
@@ -243,7 +243,7 @@ export function DecisionBar({ recommendationId, status, play }: DecisionBarProps
                     data-action={submitError ? "retry-decision" : "confirm-decision"}
                     disabled={phase === "submitting" || (openAction !== "APPROVE" && !noteValid)}
                     onClick={() => void submit()}
-                    className="rounded bg-gray-900 px-3 py-1 text-sm text-white disabled:opacity-50"
+                    className="rounded bg-primary px-3 py-1 text-sm text-white disabled:opacity-50"
                   >
                     {submitError ? "Retry" : phase === "submitting" ? "Submitting…" : "Confirm"}
                   </button>

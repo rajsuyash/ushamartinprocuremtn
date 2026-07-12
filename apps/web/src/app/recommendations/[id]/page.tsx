@@ -35,7 +35,7 @@ export default async function RecommendationDetailPage({
     <main className="mx-auto max-w-4xl space-y-6 p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted">
             <Link href="/recommendations" className="underline">
               ← All recommendations
             </Link>
@@ -86,7 +86,7 @@ export default async function RecommendationDetailPage({
               </span>
             </section>
           ) : null}
-          <p className="text-sm text-gray-600" data-testid="audit-line">
+          <p className="text-sm text-muted" data-testid="audit-line">
             {rec.decision.action} by {rec.decision.decidedByEmail} at{" "}
             {formatDateTime(rec.decision.decidedAt)}
             {rec.decision.note ? ` — "${rec.decision.note}"` : ""}
@@ -103,13 +103,13 @@ function ErrorPanel({ rationale }: { rationale: RecommendationRationale }) {
   return (
     <section
       data-testid="rationale-panel"
-      className="space-y-2 rounded border border-red-200 bg-red-50 p-4 text-sm"
+      className="space-y-2 rounded border border-risk bg-risk-surface p-4 text-sm"
     >
-      <p className="font-medium text-red-800">Error: {error.code}</p>
+      <p className="font-medium text-risk">Error: {error.code}</p>
       {Array.isArray(error.bindingConstraints) && error.bindingConstraints.length > 0 ? (
         <div>
-          <p className="text-xs font-medium text-red-700">Binding constraints</p>
-          <ul className="list-inside list-disc text-red-700">
+          <p className="text-xs font-medium text-risk">Binding constraints</p>
+          <ul className="list-inside list-disc text-risk">
             {(error.bindingConstraints as string[]).map((c) => (
               <li key={c}>{c}</li>
             ))}
@@ -124,7 +124,7 @@ function RationalePanel({ rationale }: { rationale: RecommendationRationale }) {
   const inputs = rationale.inputs;
   if (!inputs) {
     return (
-      <p className="text-sm text-gray-500" data-testid="rationale-panel">
+      <p className="text-sm text-muted" data-testid="rationale-panel">
         No rationale recorded for this recommendation.
       </p>
     );
@@ -133,20 +133,20 @@ function RationalePanel({ rationale }: { rationale: RecommendationRationale }) {
   const constraintsRespected = rationale.constraintsRespected ?? [];
 
   return (
-    <section data-testid="rationale-panel" className="space-y-4 rounded border border-gray-200 p-4">
+    <section data-testid="rationale-panel" className="space-y-4 rounded-xl border border-border bg-surface p-4">
       <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
         <div>
-          <p className="text-xs text-gray-500">Cover vs floor</p>
+          <p className="text-xs text-muted">Cover vs floor</p>
           <p className="font-medium">
             {inputs.coverDays}d vs {inputs.minCoverDays}d
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Spot (₹/MT)</p>
+          <p className="text-xs text-muted">Spot (₹/MT)</p>
           <p className="font-medium">{formatPriceInrMt(inputs.spotInrMt)}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">4w band (P10 / P50 / P90)</p>
+          <p className="text-xs text-muted">4w band (P10 / P50 / P90)</p>
           <p className="font-medium">
             {formatPriceInrMt(inputs.band4w.p10)} / {formatPriceInrMt(inputs.band4w.p50)} /{" "}
             {formatPriceInrMt(inputs.band4w.p90)}
@@ -155,14 +155,14 @@ function RationalePanel({ rationale }: { rationale: RecommendationRationale }) {
       </div>
 
       <div>
-        <p className="mb-1 text-xs font-medium text-gray-500">Supplier spread (₹/MT)</p>
+        <p className="mb-1 text-xs font-medium text-muted">Supplier spread (₹/MT)</p>
         <table
           data-testid="spread-table"
           className="w-full max-w-sm border-collapse text-left text-xs"
         >
           <tbody>
             {Object.entries(inputs.spread).map(([supplier, price]) => (
-              <tr key={supplier} className="border-b border-gray-100">
+              <tr key={supplier} className="border-b border-border hover:bg-surface-alt">
                 <td className="py-1 pr-4">{supplier}</td>
                 <td className="py-1">{formatPriceInrMt(price)}</td>
               </tr>
@@ -172,9 +172,9 @@ function RationalePanel({ rationale }: { rationale: RecommendationRationale }) {
       </div>
 
       <div>
-        <p className="mb-1 text-xs font-medium text-gray-500">Drivers</p>
+        <p className="mb-1 text-xs font-medium text-muted">Drivers</p>
         {drivers.length === 0 ? (
-          <p className="text-sm text-gray-400">No drivers recorded.</p>
+          <p className="text-sm text-muted">No drivers recorded.</p>
         ) : (
           <ul className="space-y-1 text-sm">
             {drivers.map((d) => (
@@ -190,7 +190,7 @@ function RationalePanel({ rationale }: { rationale: RecommendationRationale }) {
         {constraintsRespected.map((c) => (
           <span
             key={c}
-            className="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+            className="inline-block rounded-full bg-surface-alt px-3 py-1 text-xs font-medium text-muted"
           >
             {c}
           </span>
@@ -210,25 +210,25 @@ function ExpectedImpactPanel({ impact }: { impact: ExpectedImpact }) {
   return (
     <section
       data-testid="expected-impact"
-      className="space-y-3 rounded border border-gray-200 p-4"
+      className="space-y-3 rounded-xl border border-border bg-surface p-4"
     >
-      <p className="text-sm font-medium text-gray-700">Expected impact</p>
+      <p className="text-sm font-medium text-muted">Expected impact</p>
 
-      <div className="relative h-2 rounded-full bg-gray-100">
+      <div className="relative h-2 rounded-full bg-surface-alt">
         <div
-          className="absolute h-2 rounded-full bg-blue-200"
+          className="absolute h-2 rounded-full bg-secondary-surface"
           style={{
             left: `${Math.min(layout.p10Pct, layout.p90Pct)}%`,
             width: `${Math.abs(layout.p90Pct - layout.p10Pct)}%`,
           }}
         />
         <div
-          className="absolute top-1/2 h-3 w-0.5 -translate-y-1/2 bg-gray-400"
+          className="absolute top-1/2 h-3 w-0.5 -translate-y-1/2 bg-muted"
           style={{ left: `${layout.zeroPct}%` }}
           aria-hidden
         />
         <div
-          className="absolute top-1/2 h-3 w-1 -translate-y-1/2 rounded bg-blue-700"
+          className="absolute top-1/2 h-3 w-1 -translate-y-1/2 rounded bg-secondary"
           style={{ left: `${layout.p50Pct}%` }}
           aria-hidden
         />
@@ -236,18 +236,18 @@ function ExpectedImpactPanel({ impact }: { impact: ExpectedImpact }) {
 
       <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
         <div>
-          <dt className="text-xs text-gray-500">Cost Δ (P10 / P50 / P90)</dt>
+          <dt className="text-xs text-muted">Cost Δ (P10 / P50 / P90)</dt>
           <dd className="font-medium">
             {formatImpactInr(impact.costDeltaP10Inr)} / {formatImpactInr(impact.costDeltaInr)} /{" "}
             {formatImpactInr(impact.costDeltaP90Inr)}
           </dd>
         </div>
         <div>
-          <dt className="text-xs text-gray-500">Working capital Δ</dt>
+          <dt className="text-xs text-muted">Working capital Δ</dt>
           <dd className="font-medium">{formatImpactInr(impact.wcDeltaInr)}</dd>
         </div>
         <div>
-          <dt className="text-xs text-gray-500">Cover after</dt>
+          <dt className="text-xs text-muted">Cover after</dt>
           <dd className="font-medium">{impact.coverAfterDays}d</dd>
         </div>
       </dl>
@@ -258,7 +258,7 @@ function ExpectedImpactPanel({ impact }: { impact: ExpectedImpact }) {
 function OrderLinesTable({ orderLines }: { orderLines: OrderLine[] }) {
   if (orderLines.length === 0) {
     return (
-      <p className="text-sm text-gray-500" data-testid="order-lines-empty">
+      <p className="text-sm text-muted" data-testid="order-lines-empty">
         No order lines (this play carries no purchase, e.g. WAIT / HEDGE_LOCK).
       </p>
     );
@@ -266,7 +266,7 @@ function OrderLinesTable({ orderLines }: { orderLines: OrderLine[] }) {
   return (
     <table data-testid="order-lines-table" className="w-full border-collapse text-left text-sm">
       <thead>
-        <tr className="border-b border-gray-200 text-gray-500">
+        <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted">
           <th className="py-2 pr-4 font-medium">Supplier</th>
           <th className="py-2 pr-4 font-medium">Qty (MT)</th>
           <th className="py-2 pr-4 font-medium">Target week</th>
@@ -275,7 +275,7 @@ function OrderLinesTable({ orderLines }: { orderLines: OrderLine[] }) {
       </thead>
       <tbody>
         {orderLines.map((line, i) => (
-          <tr key={`${line.supplierCode}-${i}`} className="border-b border-gray-100">
+          <tr key={`${line.supplierCode}-${i}`} className="border-b border-border hover:bg-surface-alt">
             <td className="py-2 pr-4">{line.supplierCode}</td>
             <td className="py-2 pr-4">{formatQtyMt(line.qtyMt)}</td>
             <td className="py-2 pr-4">{line.targetWeek}</td>

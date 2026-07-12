@@ -36,7 +36,7 @@ export default function LoginForm() {
     <form
       data-testid="login-form"
       onSubmit={onSubmit}
-      className="w-full max-w-sm space-y-4 rounded-lg border border-gray-200 p-6"
+      className="w-full max-w-sm space-y-4 rounded-xl border border-border bg-surface p-6 shadow-sm"
     >
       <h1 className="text-lg font-semibold">Sign in</h1>
       <div className="space-y-1">
@@ -49,7 +49,7 @@ export default function LoginForm() {
           type="email"
           required
           autoComplete="email"
-          className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded border border-border px-3 py-2 text-sm"
         />
       </div>
       <div className="space-y-1">
@@ -62,18 +62,18 @@ export default function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded border border-border px-3 py-2 text-sm"
         />
       </div>
       {error ? (
-        <p role="alert" data-testid="login-error" className="text-sm text-red-600">
+        <p role="alert" data-testid="login-error" className="text-sm text-risk">
           {error}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded bg-black px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="w-full rounded bg-primary px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
       >
         {submitting ? "Signing in…" : "Sign in"}
       </button>

@@ -59,20 +59,20 @@ export default async function ForecastsPage({ searchParams }: ForecastsPageProps
     <main className="mx-auto max-w-4xl space-y-6 p-8">
       <div>
         <h1 className="text-lg font-semibold">Forecasts</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           Expected demand and the likely market price range for the weeks ahead.
         </p>
       </div>
 
-      <nav className="flex gap-4 border-b border-gray-200 text-sm" aria-label="Forecast type">
+      <nav className="flex gap-4 border-b border-border text-sm" aria-label="Forecast type">
         {TABS.map((t) => (
           <Link
             key={t.key}
             href={tabHref(t.key)}
             className={
               tab === t.key
-                ? "border-b-2 border-gray-900 pb-2 font-medium text-gray-900"
-                : "pb-2 text-gray-500 hover:text-gray-700"
+                ? "border-b-2 border-primary pb-2 font-medium text-ink"
+                : "pb-2 text-muted hover:text-muted"
             }
           >
             {t.label}
@@ -98,7 +98,7 @@ async function DemandTab({
 }) {
   if (seriesOptions.length === 0 || !selected) {
     return (
-      <p className="text-sm text-gray-500" data-testid="forecasts-empty">
+      <p className="text-sm text-muted" data-testid="forecasts-empty">
         No material x plant series with consumption history yet.
       </p>
     );
@@ -111,7 +111,7 @@ async function DemandTab({
       <SeriesSelector options={seriesOptions} selected={selected} />
 
       {!run ? (
-        <p className="text-sm text-gray-500" data-testid="forecasts-empty">
+        <p className="text-sm text-muted" data-testid="forecasts-empty">
           No forecast run yet. Run a recompute from{" "}
           <Link href="/data" className="underline">
             /data
@@ -124,7 +124,7 @@ async function DemandTab({
         // path is exercised here via warnings.test.ts, not the seeded fixtures).
         <span
           data-testid="insufficient-chip"
-          className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800"
+          className="inline-block rounded-full bg-warn-surface px-3 py-1 text-xs font-medium text-warn"
         >
           Insufficient history for this series
         </span>
@@ -154,8 +154,8 @@ function SeriesSelector({
             aria-current={isActive ? "true" : undefined}
             className={
               isActive
-                ? "rounded-full bg-gray-900 px-3 py-1 text-white"
-                : "rounded-full border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-50"
+                ? "rounded-full bg-primary px-3 py-1 text-white"
+                : "rounded-full border border-border px-3 py-1 text-muted hover:bg-surface-alt"
             }
           >
             {key}
@@ -171,7 +171,7 @@ async function DemandSeriesView({ series, runId }: { series: SeriesKey; runId: s
 
   if (!data) {
     return (
-      <p className="text-sm text-gray-500" data-testid="forecasts-empty">
+      <p className="text-sm text-muted" data-testid="forecasts-empty">
         No data for this series.
       </p>
     );
@@ -196,7 +196,7 @@ async function DemandSeriesView({ series, runId }: { series: SeriesKey; runId: s
       {data.model && data.backtestWape !== null ? (
         <span
           data-testid="wape-badge"
-          className="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+          className="inline-block rounded-full bg-surface-alt px-3 py-1 text-xs font-medium text-muted"
         >
           {data.model} · WAPE {(data.backtestWape * 100).toFixed(1)}%
         </span>
@@ -207,7 +207,7 @@ async function DemandSeriesView({ series, runId }: { series: SeriesKey; runId: s
       {/* PRD §11 accessibility: text equivalent of the chart via a native
           disclosure widget — no JS required, works before hydration. */}
       <details>
-        <summary className="cursor-pointer text-sm text-gray-600">
+        <summary className="cursor-pointer text-sm text-muted">
           View data table (text equivalent of the chart)
         </summary>
         <table
@@ -215,7 +215,7 @@ async function DemandSeriesView({ series, runId }: { series: SeriesKey; runId: s
           className="mt-2 w-full border-collapse text-left text-xs"
         >
           <thead>
-            <tr className="border-b border-gray-200 text-gray-500">
+            <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted">
               <th className="py-1 pr-4 font-medium">Week</th>
               <th className="py-1 pr-4 font-medium">Type</th>
               <th className="py-1 font-medium">Qty (MT)</th>
@@ -223,14 +223,14 @@ async function DemandSeriesView({ series, runId }: { series: SeriesKey; runId: s
           </thead>
           <tbody>
             {data.history.map((p) => (
-              <tr key={`h-${p.week}`} className="border-b border-gray-100">
+              <tr key={`h-${p.week}`} className="border-b border-border hover:bg-surface-alt">
                 <td className="py-1 pr-4">{p.week}</td>
                 <td className="py-1 pr-4">Actual</td>
                 <td className="py-1">{formatQtyMt(p.qtyMt)}</td>
               </tr>
             ))}
             {data.forecast.map((p) => (
-              <tr key={`f-${p.week}`} className="border-b border-gray-100">
+              <tr key={`f-${p.week}`} className="border-b border-border hover:bg-surface-alt">
                 <td className="py-1 pr-4">{p.week}</td>
                 <td className="py-1 pr-4">Forecast</td>
                 <td className="py-1">{formatQtyMt(p.qtyMt)}</td>
@@ -257,7 +257,7 @@ async function PriceTab({
 }) {
   if (gradeOptions.length === 0 || !selectedGrade) {
     return (
-      <p className="text-sm text-gray-500" data-testid="forecasts-empty">
+      <p className="text-sm text-muted" data-testid="forecasts-empty">
         No grade families with market price history yet.
       </p>
     );
@@ -270,7 +270,7 @@ async function PriceTab({
       <GradeFamilySelector options={gradeOptions} selected={selectedGrade} />
 
       {!run ? (
-        <p className="text-sm text-gray-500" data-testid="forecasts-empty">
+        <p className="text-sm text-muted" data-testid="forecasts-empty">
           No forecast run yet. Run a recompute from{" "}
           <Link href="/data" className="underline">
             /data
@@ -302,8 +302,8 @@ function GradeFamilySelector({
             aria-current={isActive ? "true" : undefined}
             className={
               isActive
-                ? "rounded-full bg-gray-900 px-3 py-1 text-white"
-                : "rounded-full border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-50"
+                ? "rounded-full bg-primary px-3 py-1 text-white"
+                : "rounded-full border border-border px-3 py-1 text-muted hover:bg-surface-alt"
             }
           >
             {grade}
@@ -327,7 +327,7 @@ async function PriceSeriesView({
 
   if (!data) {
     return (
-      <p className="text-sm text-gray-500" data-testid="forecasts-empty">
+      <p className="text-sm text-muted" data-testid="forecasts-empty">
         No data for this grade family.
       </p>
     );
@@ -364,7 +364,7 @@ async function PriceSeriesView({
         {coverageBand && coverageBand.coverage8090 !== null ? (
           <span
             data-testid="coverage-badge"
-            className="inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+            className="inline-block rounded-full bg-surface-alt px-3 py-1 text-xs font-medium text-muted"
           >
             decision band · {(coverageBand.coverage8090 * 100).toFixed(0)}% coverage (4w)
           </span>
@@ -375,7 +375,7 @@ async function PriceSeriesView({
           // reduced model quality rather than hiding or silently pretending.
           <span
             data-testid="baseline-fallback-chip"
-            className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800"
+            className="inline-block rounded-full bg-warn-surface px-3 py-1 text-xs font-medium text-warn"
           >
             Baseline fallback (limited price history)
           </span>
@@ -387,7 +387,7 @@ async function PriceSeriesView({
       {/* PRD §11 accessibility: text equivalent of the chart via a native
           disclosure widget — no JS required, works before hydration. */}
       <details>
-        <summary className="cursor-pointer text-sm text-gray-600">
+        <summary className="cursor-pointer text-sm text-muted">
           View data table (text equivalent of the chart)
         </summary>
         <table
@@ -395,7 +395,7 @@ async function PriceSeriesView({
           className="mt-2 w-full border-collapse text-left text-xs"
         >
           <thead>
-            <tr className="border-b border-gray-200 text-gray-500">
+            <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted">
               <th className="py-1 pr-4 font-medium">Week</th>
               <th className="py-1 pr-4 font-medium">Type</th>
               <th className="py-1 pr-4 font-medium">P10 (₹/MT)</th>
@@ -405,7 +405,7 @@ async function PriceSeriesView({
           </thead>
           <tbody>
             {data.history.map((p) => (
-              <tr key={`h-${p.week}`} className="border-b border-gray-100">
+              <tr key={`h-${p.week}`} className="border-b border-border hover:bg-surface-alt">
                 <td className="py-1 pr-4">{p.week}</td>
                 <td className="py-1 pr-4">Market price</td>
                 <td className="py-1 pr-4">{formatPriceInrMt(null)}</td>
@@ -414,7 +414,7 @@ async function PriceSeriesView({
               </tr>
             ))}
             {data.bands.map((b) => (
-              <tr key={`b-${b.week}`} className="border-b border-gray-100">
+              <tr key={`b-${b.week}`} className="border-b border-border hover:bg-surface-alt">
                 <td className="py-1 pr-4">{b.week}</td>
                 <td className="py-1 pr-4">Forecast ({b.horizonWeeks}w)</td>
                 <td className="py-1 pr-4">{formatPriceInrMt(b.p10InrMt)}</td>

@@ -36,28 +36,28 @@ export default async function DataPage() {
     <main className="mx-auto max-w-3xl space-y-8 p-8">
       <div>
         <h1 className="text-lg font-semibold">Data</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           Bring in your SAP exports and market prices, then run the weekly analysis.
         </p>
       </div>
 
       <section data-testid="dataset-status" className="space-y-2">
-        <h2 className="text-sm font-medium text-gray-700">Committed data</h2>
+        <h2 className="text-sm font-medium text-muted">Committed data</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {TYPES.map((type) => {
             const s = byType.get(type);
             return (
-              <div key={type} className="rounded border border-gray-200 p-3 text-sm">
-                <p className="text-gray-500">{TEMPLATE_LABELS[type]}</p>
+              <div key={type} className="rounded-xl border border-border bg-surface p-3 text-sm">
+                <p className="text-muted">{TEMPLATE_LABELS[type]}</p>
                 <p className="text-lg font-semibold">{s?.committedRows ?? 0}</p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-muted">
                   last committed: {formatTimestamp(s?.lastCommittedAt ?? null)}
                 </p>
               </div>
             );
           })}
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           Already committed for this week?{" "}
           <a href="#run" className="underline">
             Skip to step 3 and trigger a run.
@@ -66,10 +66,10 @@ export default async function DataPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium text-gray-700">
+        <h2 className="text-sm font-medium text-muted">
           Step 1–2 · Upload, fix errors &amp; commit
         </h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted">
           Export from SAP (or fill a template) and upload one file per type. Need the format?
         </p>
         <ul className="flex flex-wrap gap-3 text-sm">
@@ -77,18 +77,18 @@ export default async function DataPage() {
             <li key={type}>
               <a
                 href={`/api/templates/${type}`}
-                className="rounded border border-gray-300 px-3 py-1 text-blue-700 underline"
+                className="rounded border border-border px-3 py-1 text-secondary underline"
               >
                 {TEMPLATE_LABELS[type]} template
               </a>
             </li>
           ))}
         </ul>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted">
           Dates: DD-MM-YYYY or YYYY-MM-DD are both accepted; an ambiguous date
           (e.g. 03-04-2026) is assumed DD-MM.
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted">
           After upload you&apos;ll see a validation preview — fix any flagged rows in your file
           and re-upload, then commit the clean data.
         </p>
@@ -96,8 +96,8 @@ export default async function DataPage() {
       </section>
 
       <section id="run" className="space-y-2">
-        <h2 className="text-sm font-medium text-gray-700">Step 3 · Trigger a run</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-sm font-medium text-muted">Step 3 · Trigger a run</h2>
+        <p className="text-sm text-muted">
           A run uses everything committed so far to produce fresh demand forecasts, price
           outlooks and one recommendation per material. When it finishes, results appear on the
           dashboard.

@@ -10,7 +10,7 @@ import type { ValueChartProps } from "./value-chart-inner";
 const ValueChartInner = dynamic(() => import("./value-chart-inner"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-72 items-center justify-center text-sm text-gray-400">
+    <div className="flex h-72 items-center justify-center text-sm text-muted">
       Loading chart…
     </div>
   ),

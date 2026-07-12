@@ -63,14 +63,14 @@ export function MemoPanel({ initialMemo, canGenerate }: MemoPanelProps) {
   return (
     <section className="space-y-3" data-testid="memo-section">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-gray-700">Weekly memo</h2>
+        <h2 className="text-sm font-medium text-muted">Weekly memo</h2>
         {canGenerate ? (
           <button
             type="button"
             data-action="generate-memo"
             disabled={phase === "generating"}
             onClick={() => void generate()}
-            className="rounded bg-gray-900 px-3 py-1 text-sm text-white disabled:opacity-50"
+            className="rounded bg-primary px-3 py-1 text-sm text-white disabled:opacity-50"
           >
             {phase === "generating" ? "Generating…" : "Generate memo"}
           </button>
@@ -78,13 +78,13 @@ export function MemoPanel({ initialMemo, canGenerate }: MemoPanelProps) {
       </div>
 
       {error ? (
-        <p role="alert" data-testid="memo-error" className="text-xs text-red-700">
+        <p role="alert" data-testid="memo-error" className="text-xs text-risk">
           {error}
         </p>
       ) : null}
 
       {memo ? <MemoContentView memo={memo} /> : (
-        <p className="text-sm text-gray-500" data-testid="memo-empty">
+        <p className="text-sm text-muted" data-testid="memo-empty">
           No memo generated yet.
         </p>
       )}
@@ -94,11 +94,11 @@ export function MemoPanel({ initialMemo, canGenerate }: MemoPanelProps) {
 
 function MemoContentView({ memo }: { memo: LatestMemo }) {
   return (
-    <div data-testid="memo-panel" className="space-y-3 rounded border border-gray-200 p-4">
+    <div data-testid="memo-panel" className="space-y-3 rounded-xl border border-border bg-surface p-4">
       {memo.mode === "TEMPLATE" ? (
         <p
           data-testid="memo-template-notice"
-          className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800"
+          className="inline-block rounded-full bg-warn-surface px-3 py-1 text-xs font-medium text-warn"
         >
           AI memo off — template mode
         </p>
@@ -108,15 +108,15 @@ function MemoContentView({ memo }: { memo: LatestMemo }) {
         {memo.content.headline}
       </h3>
 
-      <p data-testid="memo-summary" className="whitespace-pre-wrap text-sm text-gray-700">
+      <p data-testid="memo-summary" className="whitespace-pre-wrap text-sm text-muted">
         {memo.content.summaryMd}
       </p>
 
       {memo.content.keyNumbers.length > 0 ? (
         <dl data-testid="memo-key-numbers" className="flex flex-wrap gap-4">
           {memo.content.keyNumbers.map((kn) => (
-            <div key={kn.label} className="rounded bg-gray-50 px-3 py-2 text-sm">
-              <dt className="text-xs text-gray-500">{kn.label}</dt>
+            <div key={kn.label} className="rounded bg-surface-alt px-3 py-2 text-sm">
+              <dt className="text-xs text-muted">{kn.label}</dt>
               <dd className="font-medium">{kn.value}</dd>
             </div>
           ))}
@@ -124,7 +124,7 @@ function MemoContentView({ memo }: { memo: LatestMemo }) {
       ) : null}
 
       {memo.content.risks.length > 0 ? (
-        <ul data-testid="memo-risks" className="list-inside list-disc text-sm text-gray-700">
+        <ul data-testid="memo-risks" className="list-inside list-disc text-sm text-muted">
           {memo.content.risks.map((risk, i) => (
             <li key={i}>{risk}</li>
           ))}

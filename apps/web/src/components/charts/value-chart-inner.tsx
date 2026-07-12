@@ -45,7 +45,7 @@ export default function ValueChartInner({ data }: ValueChartProps) {
             type="monotone"
             dataKey="cumulativeValueInr"
             name="Cumulative value"
-            stroke="#2563eb"
+            stroke="#1a2b3c"
             dot={false}
             isAnimationActive={false}
           />

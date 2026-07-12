@@ -15,11 +15,11 @@ function isPlay(value: string): value is Play {
 }
 
 const PLAY_CHIP_CLASS: Record<Play, string> = {
-  BUY_NOW: "bg-green-100 text-green-800",
-  WAIT: "bg-gray-100 text-gray-700",
-  PARTIAL_BUY: "bg-blue-100 text-blue-800",
-  HEDGE_LOCK: "bg-purple-100 text-purple-800",
-  SPLIT_SUPPLIERS: "bg-indigo-100 text-indigo-800",
+  BUY_NOW: "bg-positive-surface text-positive",
+  WAIT: "bg-surface-alt text-muted",
+  PARTIAL_BUY: "bg-secondary-surface text-secondary",
+  HEDGE_LOCK: "bg-warn-surface text-warn",
+  SPLIT_SUPPLIERS: "bg-primary-surface text-primary",
 };
 
 /** Tailwind classes for the play chip. `play` is null for ERROR rows (PRD
@@ -27,7 +27,7 @@ const PLAY_CHIP_CLASS: Record<Play, string> = {
  * — falls back to a neutral chip rather than throwing on the null. */
 export function playChipClass(play: string | null): string {
   if (play && isPlay(play)) return PLAY_CHIP_CLASS[play];
-  return "bg-gray-100 text-gray-500";
+  return "bg-surface-alt text-muted";
 }
 
 /** Chip label: the play itself, or "ERROR" for the null-play degraded row. */
@@ -36,12 +36,12 @@ export function playChipLabel(play: string | null): string {
 }
 
 const STATUS_CHIP_CLASS: Record<RecommendationStatus, string> = {
-  PENDING: "bg-amber-100 text-amber-800",
-  APPROVED: "bg-green-100 text-green-800",
-  OVERRIDDEN: "bg-blue-100 text-blue-800",
-  REJECTED: "bg-red-100 text-red-800",
-  EXPIRED: "bg-gray-100 text-gray-500",
-  ERROR: "bg-red-200 text-red-900",
+  PENDING: "bg-warn-surface text-warn",
+  APPROVED: "bg-positive-surface text-positive",
+  OVERRIDDEN: "bg-secondary-surface text-secondary",
+  REJECTED: "bg-risk-surface text-risk",
+  EXPIRED: "bg-surface-alt text-muted",
+  ERROR: "bg-risk text-white",
 };
 
 function isRecommendationStatus(value: string): value is RecommendationStatus {
@@ -52,5 +52,5 @@ function isRecommendationStatus(value: string): value is RecommendationStatus {
  * detail page). Falls back to a neutral chip for any unrecognized value rather
  * than throwing — defensive against future enum drift. */
 export function statusChipClass(status: string): string {
-  return isRecommendationStatus(status) ? STATUS_CHIP_CLASS[status] : "bg-gray-100 text-gray-700";
+  return isRecommendationStatus(status) ? STATUS_CHIP_CLASS[status] : "bg-surface-alt text-muted";
 }

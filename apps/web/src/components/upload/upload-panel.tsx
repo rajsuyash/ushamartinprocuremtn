@@ -128,7 +128,7 @@ export function UploadPanel() {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <label htmlFor="upload-type" className="text-sm text-gray-500">
+        <label htmlFor="upload-type" className="text-sm text-muted">
           File type
         </label>
         <select
@@ -136,7 +136,7 @@ export function UploadPanel() {
           value={type}
           disabled={busy}
           onChange={(e) => setType(e.target.value as FileType)}
-          className="rounded border border-gray-300 px-2 py-1 text-sm"
+          className="rounded border border-border px-2 py-1 text-sm"
         >
           {FILE_TYPES.map((t) => (
             <option key={t.value} value={t.value}>
@@ -155,8 +155,8 @@ export function UploadPanel() {
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
         onClick={() => !busy && inputRef.current?.click()}
-        className={`flex cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed px-6 py-8 text-center text-sm text-gray-500 ${
-          dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
+        className={`flex cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed px-6 py-8 text-center text-sm text-muted ${
+          dragOver ? "border-secondary bg-secondary-surface" : "border-border"
         } ${busy ? "cursor-not-allowed opacity-60" : ""}`}
       >
         <p>
@@ -176,23 +176,23 @@ export function UploadPanel() {
       {error ? (
         <p
           role="alert"
-          className="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800"
+          className="rounded border border-risk bg-risk-surface px-3 py-2 text-sm text-risk"
         >
           {error}
         </p>
       ) : null}
 
       {stage ? (
-        <div className="space-y-2 rounded border border-gray-200 p-3 text-sm">
+        <div className="space-y-2 rounded-xl border border-border bg-surface p-3 text-sm">
           <p>
             Staged batch <span className="font-mono">{stage.batchId}</span> —{" "}
             {stage.validRows}/{stage.rows} rows valid.
           </p>
 
           {stage.errors.length > 0 ? (
-            <div className="max-h-48 overflow-auto rounded border border-amber-200">
+            <div className="max-h-48 overflow-auto rounded border border-warn">
               <table className="w-full text-left text-xs">
-                <thead className="bg-amber-50 text-amber-800">
+                <thead className="bg-warn-surface text-warn">
                   <tr>
                     <th className="px-2 py-1">Row</th>
                     <th className="px-2 py-1">Code</th>
@@ -203,7 +203,7 @@ export function UploadPanel() {
                   {stage.errors.map((e, i) => (
                     <tr
                       key={`${e.row}-${e.code}-${i}`}
-                      className="border-t border-amber-100"
+                      className="border-t border-warn"
                     >
                       <td className="px-2 py-1">{e.row}</td>
                       <td className="px-2 py-1 font-mono">{e.code}</td>
@@ -216,7 +216,7 @@ export function UploadPanel() {
           ) : null}
 
           {phase === "committed" && commit ? (
-            <p className="text-green-700">
+            <p className="text-positive">
               Committed: {commit.inserted} inserted, {commit.skippedDuplicates}{" "}
               duplicates skipped.
             </p>
@@ -227,7 +227,7 @@ export function UploadPanel() {
                 data-action="commit-batch"
                 disabled={busy}
                 onClick={() => void doCommit()}
-                className="rounded bg-gray-900 px-3 py-1 text-sm text-white disabled:opacity-50"
+                className="rounded bg-primary px-3 py-1 text-sm text-white disabled:opacity-50"
               >
                 Commit
               </button>
@@ -237,7 +237,7 @@ export function UploadPanel() {
                   data-action="commit-valid-only"
                   disabled={busy}
                   onClick={() => void doCommit("valid-only")}
-                  className="rounded border border-gray-400 px-3 py-1 text-sm disabled:opacity-50"
+                  className="rounded border border-border px-3 py-1 text-sm disabled:opacity-50"
                 >
                   Commit valid rows only
                 </button>

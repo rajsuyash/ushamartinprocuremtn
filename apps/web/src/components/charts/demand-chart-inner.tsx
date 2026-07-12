@@ -48,7 +48,7 @@ export default function DemandChartInner({ data }: DemandChartProps) {
             type="monotone"
             dataKey="actual"
             name="Actual consumption"
-            stroke="#374151"
+            stroke="#1a2b3c"
             dot={false}
             isAnimationActive={false}
           />
@@ -56,7 +56,7 @@ export default function DemandChartInner({ data }: DemandChartProps) {
             type="monotone"
             dataKey="forecast"
             name="Forecast (P50)"
-            stroke="#2563eb"
+            stroke="#eb6a1b"
             strokeDasharray="5 5"
             dot={false}
             isAnimationActive={false}

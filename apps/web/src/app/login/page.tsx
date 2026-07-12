@@ -20,20 +20,20 @@ export default function LoginPage() {
       <LoginForm />
       <section
         data-testid="demo-credentials"
-        className="w-full max-w-sm rounded border border-amber-200 bg-amber-50 p-4 text-sm"
+        className="w-full max-w-sm rounded border border-warn bg-warn-surface p-4 text-sm"
       >
-        <p className="mb-2 font-medium text-amber-900">Demo access — try any role</p>
-        <table className="w-full text-left text-xs text-amber-900">
+        <p className="mb-2 font-medium text-warn">Demo access — try any role</p>
+        <table className="w-full text-left text-xs text-warn">
           <tbody>
             {DEMO_USERS.map((u) => (
-              <tr key={u.email} className="border-b border-amber-100 last:border-0">
+              <tr key={u.email} className="border-b border-warn last:border-0">
                 <td className="py-1 pr-2 font-mono">{u.email}</td>
-                <td className="py-1 text-amber-700">{u.role}</td>
+                <td className="py-1 text-warn">{u.role}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        <p className="mt-2 text-xs text-amber-900">
+        <p className="mt-2 text-xs text-warn">
           Password (all users): <span className="font-mono font-medium">{DEMO_PASSWORD}</span>
         </p>
       </section>

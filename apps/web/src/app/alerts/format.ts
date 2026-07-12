@@ -7,15 +7,15 @@
 type AlertPayload = Record<string, unknown>;
 
 const SEVERITY_CHIP_CLASS: Record<string, string> = {
-  CRITICAL: "bg-red-100 text-red-800",
-  WARN: "bg-amber-100 text-amber-800",
-  INFO: "bg-gray-100 text-gray-600",
+  CRITICAL: "bg-risk-surface text-risk",
+  WARN: "bg-warn-surface text-warn",
+  INFO: "bg-surface-alt text-muted",
 };
 
 /** Tailwind classes for the severity chip. Falls back to a neutral chip for
  * any unrecognized value rather than throwing (defensive against enum drift). */
 export function severityChipClass(severity: string): string {
-  return SEVERITY_CHIP_CLASS[severity] ?? "bg-gray-100 text-gray-600";
+  return SEVERITY_CHIP_CLASS[severity] ?? "bg-surface-alt text-muted";
 }
 
 function signed(n: unknown): string {

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
 import { getOpenAlertCount } from "@/app/alerts/queries";
 import { auth } from "@/auth";
-import { NavLinks } from "@/components/nav-links";
+import { Sidebar, TopBar } from "@/components/nav-links";
 
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "PDI",
@@ -20,20 +23,23 @@ export default async function RootLayout({
   const openAlertCount = session?.user ? await getOpenAlertCount() : 0;
 
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className={inter.variable}>
+      <body className="h-screen overflow-hidden bg-canvas font-sans text-ink antialiased">
         {session?.user ? (
-          <nav className="border-b border-gray-200 px-8 py-3">
-            <div className="mx-auto max-w-4xl text-sm">
-              <NavLinks
+          <div className="flex h-full">
+            <Sidebar role={session.user.role} />
+            <div className="flex min-w-0 flex-1 flex-col">
+              <TopBar
                 role={session.user.role}
                 openAlertCount={openAlertCount}
                 userLabel={session.user.name ?? session.user.email ?? ""}
               />
+              <div className="flex-1 overflow-y-auto">{children}</div>
             </div>
-          </nav>
-        ) : null}
-        {children}
+          </div>
+        ) : (
+          children
+        )}
       </body>
     </html>
   );

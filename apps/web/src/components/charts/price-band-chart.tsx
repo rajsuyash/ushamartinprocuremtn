@@ -10,7 +10,7 @@ import type { PriceBandChartProps } from "./price-band-chart-inner";
 const PriceBandChartInner = dynamic(() => import("./price-band-chart-inner"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-72 items-center justify-center text-sm text-gray-400">
+    <div className="flex h-72 items-center justify-center text-sm text-muted">
       Loading chart…
     </div>
   ),

@@ -65,7 +65,7 @@ export default async function RecommendationsPage({ searchParams }: Recommendati
     <main className="mx-auto max-w-4xl space-y-6 p-8">
       <div>
         <h1 className="text-lg font-semibold">Recommendations</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           What PDI suggests you buy — approve, change, or reject each one.
         </p>
       </div>
@@ -95,7 +95,7 @@ export default async function RecommendationsPage({ searchParams }: Recommendati
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-sm text-gray-500" data-testid="recommendations-empty">
+        <p className="text-sm text-muted" data-testid="recommendations-empty">
           No recommendations match these filters.
         </p>
       ) : (
@@ -105,7 +105,7 @@ export default async function RecommendationsPage({ searchParams }: Recommendati
       {rows.length === limit ? (
         <Link
           href={hrefFor({ limit: String(limit + LOAD_MORE_STEP) })}
-          className="text-sm text-blue-700 underline"
+          className="text-sm text-secondary underline"
           data-testid="load-more"
         >
           Load more
@@ -131,7 +131,7 @@ function FilterGroup({
   if (options.length === 0) return null;
   return (
     <div className="space-y-1" data-testid={testId}>
-      <p className="text-xs font-medium text-gray-500">{label}</p>
+      <p className="text-xs font-medium text-muted">{label}</p>
       <div className="flex flex-wrap gap-2">
         <FilterLink href={hrefFor(null)} active={selected === null}>
           All
@@ -161,8 +161,8 @@ function FilterLink({
       aria-current={active ? "true" : undefined}
       className={
         active
-          ? "rounded-full bg-gray-900 px-3 py-1 text-white"
-          : "rounded-full border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-50"
+          ? "rounded-full bg-primary px-3 py-1 text-white"
+          : "rounded-full border border-border px-3 py-1 text-muted hover:bg-surface-alt"
       }
     >
       {children}
@@ -174,7 +174,7 @@ function RecommendationsTable({ rows }: { rows: RecommendationListRow[] }) {
   return (
     <table data-testid="recommendations-table" className="w-full border-collapse text-left text-sm">
       <thead>
-        <tr className="border-b border-gray-200 text-gray-500">
+        <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted">
           <th className="py-2 pr-4 font-medium">Material · Plant</th>
           <th className="py-2 pr-4 font-medium">Play</th>
           <th className="py-2 pr-4 font-medium">Status</th>
@@ -184,7 +184,7 @@ function RecommendationsTable({ rows }: { rows: RecommendationListRow[] }) {
       </thead>
       <tbody>
         {rows.map((row) => (
-          <tr key={row.id} className="border-b border-gray-100">
+          <tr key={row.id} className="border-b border-border hover:bg-surface-alt">
             <td className="py-2 pr-4">
               {row.materialCode} · {row.plantCode}
             </td>
@@ -204,7 +204,7 @@ function RecommendationsTable({ rows }: { rows: RecommendationListRow[] }) {
             </td>
             <td className="py-2 pr-4">{formatRunTime(row.createdAt)}</td>
             <td className="py-2">
-              <Link href={`/recommendations/${row.id}`} className="text-blue-700 underline">
+              <Link href={`/recommendations/${row.id}`} className="text-secondary underline">
                 View
               </Link>
             </td>

@@ -17,9 +17,9 @@ const BASELINE_FORMULA =
   "Baseline = decision-month average committed market price × decided quantity";
 
 const STATE_BADGE_CLASS: Record<ValueRowState, string> = {
-  ESTIMATED: "bg-gray-100 text-gray-700",
-  ACTUALIZED: "bg-green-100 text-green-800",
-  BASELINE_UNAVAILABLE: "bg-amber-100 text-amber-800",
+  ESTIMATED: "bg-surface-alt text-muted",
+  ACTUALIZED: "bg-positive-surface text-positive",
+  BASELINE_UNAVAILABLE: "bg-warn-surface text-warn",
 };
 
 function formatDecidedAt(iso: string): string {
@@ -50,12 +50,12 @@ export default async function PilotReportPage() {
     <main className="mx-auto max-w-4xl space-y-6 p-8">
       <div>
         <h1 className="text-lg font-semibold">Pilot report</h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted">
           Every decision measured against the market baseline — what the pilot has saved so far.
         </p>
       </div>
 
-      <p className="text-sm text-gray-500" data-testid="baseline-formula">
+      <p className="text-sm text-muted" data-testid="baseline-formula">
         {BASELINE_FORMULA}
       </p>
 
@@ -64,20 +64,20 @@ export default async function PilotReportPage() {
       {hasDecisions ? (
         <>
           <section className="space-y-2">
-            <h2 className="text-sm font-medium text-gray-700">Cumulative value</h2>
+            <h2 className="text-sm font-medium text-muted">Cumulative value</h2>
             <ValueChart data={report.cumulative} />
             <ValueTableFallback cumulative={report.cumulative} />
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-sm font-medium text-gray-700">Decisions</h2>
+            <h2 className="text-sm font-medium text-muted">Decisions</h2>
             <DecisionsTable rows={report.decisions} />
           </section>
         </>
       ) : (
         // F8-ERR1: explicit empty state; the baseline formula above still renders,
         // and the chart is never mounted against zero rows (empty-safe).
-        <p className="text-sm text-gray-500" data-testid="reports-empty">
+        <p className="text-sm text-muted" data-testid="reports-empty">
           No decisions in period.
         </p>
       )}
@@ -92,21 +92,21 @@ export default async function PilotReportPage() {
 function AdoptionStats({ summary }: { summary: Awaited<ReturnType<typeof computeValueReport>>["summary"] }) {
   return (
     <section
-      className="flex flex-wrap gap-6 rounded border border-gray-200 p-4 text-sm"
+      className="flex flex-wrap gap-6 rounded-xl border border-border bg-surface p-4 text-sm"
       data-testid="adoption-stats"
     >
       <div>
-        <p className="text-xs text-gray-500">Total value</p>
+        <p className="text-xs text-muted">Total value</p>
         <p className="font-medium">{formatMoneyInr(summary.totalValueInr)}</p>
       </div>
       <div>
-        <p className="text-xs text-gray-500">Decisions</p>
+        <p className="text-xs text-muted">Decisions</p>
         <p className="font-medium">
           {summary.decidedCount} of {summary.totalRecommendations}
         </p>
       </div>
       <div>
-        <p className="text-xs text-gray-500">Adoption</p>
+        <p className="text-xs text-muted">Adoption</p>
         <p className="font-medium">{formatPct(summary.adoptionPct, 1)}</p>
       </div>
     </section>
@@ -122,19 +122,19 @@ function ValueTableFallback({
     // PRD §11 accessibility: text equivalent of the chart via a native
     // disclosure widget — same pattern as /forecasts (no JS required).
     <details>
-      <summary className="cursor-pointer text-sm text-gray-600">
+      <summary className="cursor-pointer text-sm text-muted">
         View data table (text equivalent of the chart)
       </summary>
       <table className="mt-2 w-full border-collapse text-left text-xs">
         <thead>
-          <tr className="border-b border-gray-200 text-gray-500">
+          <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted">
             <th className="py-1 pr-4 font-medium">Decided at</th>
             <th className="py-1 font-medium">Cumulative value</th>
           </tr>
         </thead>
         <tbody>
           {cumulative.map((c, i) => (
-            <tr key={`${c.decidedAt}-${i}`} className="border-b border-gray-100">
+            <tr key={`${c.decidedAt}-${i}`} className="border-b border-border hover:bg-surface-alt">
               <td className="py-1 pr-4">{formatDecidedAt(c.decidedAt)}</td>
               <td className="py-1">{formatMoneyInr(c.cumulativeValueInr)}</td>
             </tr>
@@ -149,7 +149,7 @@ function DecisionsTable({ rows }: { rows: DecisionValueRow[] }) {
   return (
     <table data-testid="decisions-table" className="w-full border-collapse text-left text-sm">
       <thead>
-        <tr className="border-b border-gray-200 text-gray-500">
+        <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted">
           <th className="py-2 pr-4 font-medium">Material · Plant</th>
           <th className="py-2 pr-4 font-medium">System play</th>
           <th className="py-2 pr-4 font-medium">Human action</th>
@@ -163,7 +163,7 @@ function DecisionsTable({ rows }: { rows: DecisionValueRow[] }) {
       </thead>
       <tbody>
         {rows.map((row) => (
-          <tr key={row.recommendationId} className="border-b border-gray-100">
+          <tr key={row.recommendationId} className="border-b border-border hover:bg-surface-alt">
             <td className="py-2 pr-4">
               {row.materialCode} · {row.plantCode}
             </td>
@@ -208,16 +208,16 @@ function ForecastQualityPanel({
 }) {
   return (
     <section className="space-y-3" data-testid="quality-panel">
-      <h2 className="text-sm font-medium text-gray-700">Forecast quality</h2>
+      <h2 className="text-sm font-medium text-muted">Forecast quality</h2>
 
       {!hasRun ? (
-        <p className="text-sm text-gray-500">No forecast run yet.</p>
+        <p className="text-sm text-muted">No forecast run yet.</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="mb-1 text-xs font-medium text-gray-500">Demand WAPE (per series)</p>
+            <p className="mb-1 text-xs font-medium text-muted">Demand WAPE (per series)</p>
             {demandQuality.length === 0 ? (
-              <p className="text-sm text-gray-400">No series forecast yet.</p>
+              <p className="text-sm text-muted">No series forecast yet.</p>
             ) : (
               <ul className="space-y-1 text-sm">
                 {demandQuality.map((q) => (
@@ -230,11 +230,11 @@ function ForecastQualityPanel({
             )}
           </div>
           <div>
-            <p className="mb-1 text-xs font-medium text-gray-500">
+            <p className="mb-1 text-xs font-medium text-muted">
               Price decision band coverage (4w)
             </p>
             {priceQuality.length === 0 ? (
-              <p className="text-sm text-gray-400">No price band forecast yet.</p>
+              <p className="text-sm text-muted">No price band forecast yet.</p>
             ) : (
               <ul className="space-y-1 text-sm">
                 {priceQuality.map((q) => (
