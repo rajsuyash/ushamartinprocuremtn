@@ -44,10 +44,13 @@ function NavRow({ item, active }: { item: NavItem; active: boolean }) {
       href={item.href}
       className={`${ITEM_CLASS} ${active ? ACTIVE_CLASS : INACTIVE_CLASS}`}
     >
-      <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+      <span
+        className="material-symbols-outlined flex-shrink-0 text-[20px]"
+        aria-hidden="true"
+      >
         {item.icon}
       </span>
-      {item.label}
+      <span className="truncate">{item.label}</span>
     </Link>
   );
 }

@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 /* Material Symbols Outlined — nav + section-header icons only (per restyle spec). */
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap");
 
 /*
  * Design tokens translated from the Stitch (Google Stitch) M3-style palette

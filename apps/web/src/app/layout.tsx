@@ -24,6 +24,15 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        {/* Loaded via <link>, not CSS @import — the production bundler strips remote
+            @imports that end up after next/font's injected @font-face rules. */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+        />
+      </head>
       <body className="h-screen overflow-hidden bg-canvas font-sans text-ink antialiased">
         {session?.user ? (
           <div className="flex h-full">

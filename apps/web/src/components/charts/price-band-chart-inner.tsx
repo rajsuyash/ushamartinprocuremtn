@@ -53,7 +53,13 @@ export default function PriceBandChartInner({ data }: PriceBandChartProps) {
         <ComposedChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="week" tick={{ fontSize: 11 }} />
-          <YAxis tick={{ fontSize: 11 }} width={64} tickFormatter={formatPriceInrMt} />
+          {/* Zero-based axis squashes a ₹52-57k series into the top 15% of the plot */}
+          <YAxis
+            tick={{ fontSize: 11 }}
+            width={64}
+            tickFormatter={formatPriceInrMt}
+            domain={["dataMin - 1000", "dataMax + 1000"]}
+          />
           <Tooltip formatter={formatTooltipValue} />
           <Legend />
           <Area
