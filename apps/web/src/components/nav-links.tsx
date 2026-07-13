@@ -30,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/data", label: "Data", icon: "upload_file" },
   { href: "/forecasts", label: "Forecasts", icon: "trending_up" },
   { href: "/recommendations", label: "Recommendations", icon: "fact_check" },
+  { href: "/sandbox", label: "Strategy Planner", icon: "precision_manufacturing" },
   { href: "/alerts", label: "Alerts", icon: "notifications" },
   { href: "/reports/pilot", label: "Pilot report", icon: "insights" },
 ];

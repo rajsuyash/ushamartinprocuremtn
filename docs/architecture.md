@@ -11,7 +11,8 @@ Greenfield — this describes what M0–M7 build, not what exists yet.
                     │  middleware: session + role gate         │
                     │  /api/* route handlers (envelope)        │
                     │  UI: dashboard, /data, /forecasts,       │
-                    │      /recommendations, /alerts, /reports │
+                    │      /recommendations, /sandbox,         │
+                    │      /alerts, /reports                   │
                     └───────┬──────────────────┬───────────────┘
                             │ internal HTTP    │ Drizzle
                             ▼ ENGINE_URL       ▼
@@ -20,6 +21,7 @@ Greenfield — this describes what M0–M7 build, not what exists yet.
                     │ FastAPI :8000    │─▶│ (shared DB)  │
                     │ /v1/forecast/*   │  └──────────────┘
                     │ /v1/recommend    │
+                    │ /v1/simulate     │
                     │ /health          │
                     └──────────────────┘
 ```

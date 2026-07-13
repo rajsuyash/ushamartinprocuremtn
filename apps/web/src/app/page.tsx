@@ -5,6 +5,7 @@ import { getOpenAlertCount } from "@/app/alerts/queries";
 import { getDatasetStatus } from "@/app/data/queries";
 import { auth } from "@/auth";
 import type { Role } from "@/auth/access";
+import { KpiCard } from "@/components/kpi-card";
 
 import { dismissWelcomeAction } from "./actions";
 import { formatPriceInrMt } from "./forecasts/format";
@@ -173,28 +174,6 @@ function pickWorstCoverTile(tiles: DashboardTile[]): WorstCoverTile | null {
     }
   }
   return worst;
-}
-
-function KpiCard({
-  label,
-  value,
-  context,
-  risk,
-}: {
-  label: string;
-  value: string;
-  context?: string;
-  risk?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-xl border border-border bg-surface p-4 ${risk ? "border-l-4 border-l-risk" : ""}`}
-    >
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted">{label}</p>
-      <p className={`mt-2 text-2xl font-semibold ${risk ? "text-risk" : "text-ink"}`}>{value}</p>
-      {context ? <p className="mt-1 text-xs text-muted">{context}</p> : null}
-    </div>
-  );
 }
 
 function WelcomeCard() {
