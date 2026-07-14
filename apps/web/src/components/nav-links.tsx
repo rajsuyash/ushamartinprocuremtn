@@ -93,6 +93,7 @@ export function Sidebar({ role }: { role: Role }) {
       </div>
 
       <div className="flex flex-col gap-2 border-t border-border pt-4">
+        <NavRow item={{ href: "/guide", label: "Guide", icon: "help" }} active={isActive(pathname, "/guide")} />
         <form action={signOutAction}>
           <button
             type="submit"

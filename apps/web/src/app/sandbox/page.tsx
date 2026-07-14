@@ -73,12 +73,23 @@ export default async function SandboxPage() {
 
 function PageHeader() {
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-ink">Strategy Planner</h1>
-      <p className="text-sm text-muted">
-        Simulate what-if scenarios against the latest run — tweak policy, lead times, prices or a
-        forced buy, and compare against the system&apos;s plan. Nothing here is saved or decided.
-      </p>
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 className="text-2xl font-semibold text-ink">Strategy Planner</h1>
+        <p className="text-sm text-muted">
+          Simulate what-if scenarios against the latest run — tweak policy, lead times, prices or a
+          forced buy, and compare against the system&apos;s plan. Nothing here is saved or decided.
+        </p>
+      </div>
+      <Link
+        href="/guide#inputs"
+        className="flex flex-shrink-0 items-center gap-1.5 rounded border border-border px-3 py-1.5 text-sm font-medium text-ink hover:bg-surface-alt"
+      >
+        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+          help
+        </span>
+        How to use this
+      </Link>
     </div>
   );
 }
