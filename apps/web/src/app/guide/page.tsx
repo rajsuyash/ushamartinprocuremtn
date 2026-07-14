@@ -125,6 +125,46 @@ export default function GuidePage() {
             body="A row-by-row comparison of the system's current plan against your scenario — play, order quantity, committed spend, cover after, expected cost impact and primary supplier — with the variance for each."
           />
         </div>
+        <p>
+          Want to know where these numbers come from? See{" "}
+          <a href="#logic" className="text-secondary underline underline-offset-2">
+            how the prediction works
+          </a>
+          .
+        </p>
+      </Section>
+
+      <Section id="logic" title="How the prediction works">
+        <p>
+          Every number PDI shows comes from a transparent, repeatable pipeline — not a black box,
+          and not generative AI. The same data always produces the same answer.
+        </p>
+        <div className="space-y-4">
+          <Variable
+            name="1 · Demand forecast"
+            body="For each material × plant, PDI fits three candidate models — a seasonal-naïve baseline, an ETS statistical model, and a LightGBM gradient-boosting model — and backtests each with rolling-origin evaluation (re-fitting week by week over the recent history). The lowest-error model wins, and its error (WAPE) is shown alongside the forecast so you know how much to trust it."
+          />
+          <Variable
+            name="2 · Price band"
+            body="Prices are forecast as a range, never a single point. A quantile model produces P10 / P50 / P90 bands at 1-, 4- and 12-week horizons. PDI backtests how often the actual price actually landed inside the P10–P90 band (its 'coverage') and shows that honestly — even when it's unflattering — so you know how reliable the band is."
+          />
+          <Variable
+            name="3 · Optimization"
+            body="A mixed-integer optimizer (OR-Tools) searches for the plan that minimizes expected landed cost over the next 12 weeks, subject to your policy: never breaching the cover floor, never exceeding a supplier's concentration cap, and staying within any working-capital limit. The constraints are hard — a plan that would violate them is impossible by construction."
+          />
+          <Variable
+            name="4 · Impact range"
+            body="A Monte Carlo simulation runs 500 seeded price paths drawn from the band to estimate the plan's cost impact as a range (P10–P90), not a false-precision single figure. The seeds are fixed, so the range is reproducible."
+          />
+          <Variable
+            name="5 · The play"
+            body="A deterministic rule set maps the optimizer's solution to exactly one of the five plays, with the drivers spelled out. No language model touches this step — the reasoning is auditable rules, the same every run."
+          />
+        </div>
+        <Callout icon="verified_user">
+          Because the whole chain is deterministic and rule-based, every recommendation is
+          reproducible and auditable — and a human always makes the final call.
+        </Callout>
       </Section>
 
       <Section id="plays" title="The five plays">
@@ -166,6 +206,7 @@ const SECTIONS = [
   ["planner", "The Strategy Planner"],
   ["inputs", "What each input means"],
   ["results", "Reading the results"],
+  ["logic", "How the prediction works"],
   ["plays", "The five plays"],
   ["glossary", "Glossary"],
 ] as const;
