@@ -30,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/data", label: "Data", icon: "upload_file" },
   { href: "/forecasts", label: "Forecasts", icon: "trending_up" },
   { href: "/recommendations", label: "Recommendations", icon: "fact_check" },
+  { href: "/sandbox", label: "Strategy Planner", icon: "precision_manufacturing" },
   { href: "/alerts", label: "Alerts", icon: "notifications" },
   { href: "/reports/pilot", label: "Pilot report", icon: "insights" },
 ];
@@ -92,6 +93,7 @@ export function Sidebar({ role }: { role: Role }) {
       </div>
 
       <div className="flex flex-col gap-2 border-t border-border pt-4">
+        <NavRow item={{ href: "/guide", label: "Guide", icon: "help" }} active={isActive(pathname, "/guide")} />
         <form action={signOutAction}>
           <button
             type="submit"

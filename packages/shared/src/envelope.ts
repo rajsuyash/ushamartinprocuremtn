@@ -20,6 +20,9 @@ export type ErrorCode =
   | "OVERRIDE_PLAY_REQUIRED"
   | "DECISION_NOT_ALLOWED"
   | "ENGINE_UNAVAILABLE"
+  // F10 simulation: no DONE run to baseline against / engine rejected the series.
+  | "NO_COMPLETED_RUN"
+  | "SIMULATION_FAILED"
   // ponytail: T11 — one recompute at a time; 409 when a run is already QUEUED/RUNNING.
   | "RUN_IN_PROGRESS"
   | "ALREADY_ACKED"

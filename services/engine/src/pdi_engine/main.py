@@ -6,6 +6,7 @@ import psycopg
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
+from .api.simulate import router as simulate_router
 from .api.stages import router as stages_router
 from .config import get_settings
 
@@ -24,6 +25,7 @@ app = FastAPI(
 )
 
 app.include_router(stages_router)
+app.include_router(simulate_router)
 
 
 def _db_ping(database_url: str) -> bool:
